@@ -1,0 +1,5303 @@
+[19:00:47] ======================================================================
+[19:00:47] 시작 C:\Users\roina\.gemini\antigravity\brain\0327280a-f101-4e9f-9701-4ac103964371\scratch\b5_1_spec.json -> c:\Users\roina\Desktop\code\codyssey\2.Element(260903-Now)\b5-1 (8개 파일)
+
+----- write mini_redis/linked_list.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/linked_list.py
+class Node:
+    """Node for a doubly linked list."""
+
+    def __init__(self, data: object) -> None:
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """Doubly linked list supporting O(1) insert/remove/move operations."""
+
+    def __init__(self) -> None:
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = None
+
+    def move_to_front(self, node: Node) -> None:
+        if node is self.head:
+            return
+
+        if node.prev is not None:
+            node.prev.next = node.next
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = self.head
+
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+
+        self.head = node
+
+    def is_empty(self) -> bool:
+        return self.head is None
+
+    def __iter__(self) -> object:
+        current = self.head
+        while current is not None:
+            yield current.data
+            current = current.next
+
+
+[만들 파일]
+경로: mini_redis/linked_list.py
+목적: 이중 연결 리스트(Node, DoublyLinkedList) 구현 및 모든 메서드 docstring 보강
+
+[계약]
+- 기존 Node(data, prev, next) 및 DoublyLinkedList의 모든 메서드 시그니처와 동작(insert_front, insert_back, remove_front, remove_back, remove_node, move_to_front, is_empty, __iter__)을 그대로 유지할 것
+- 모든 연산은 O(1) 포인터 재연결 방식을 유지할 것
+- Node.__init__ 및 DoublyLinkedList의 각 메서드마다 역할과 시간 복잡도 O(1)을 설명하는 docstring을 추가할 것
+- dict, set, collections 사용 금지
+
+이제 mini_redis/linked_list.py 의 내용만 출력한다.
+[19:00:56] write      gpt-5.4        mini_redis/linked_list.py 입력   1059 출력   935 차감   1994 누적    1994 (9초)
+
+----- write mini_redis/linked_list.py / 응답 / gpt-5.4 -----
+class Node:
+    """이중 연결 리스트의 노드이다."""
+
+    def __init__(self, data: object) -> None:
+        """데이터를 담는 노드를 초기화한다. 노드 생성은 포인터 대입만 수행하므로 O(1)이다."""
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """O(1) 포인터 재연결로 앞뒤 삽입, 삭제, 이동을 지원하는 이중 연결 리스트이다."""
+
+    def __init__(self) -> None:
+        """빈 리스트를 초기화한다. head와 tail 설정만 수행하므로 O(1)이다."""
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        """리스트 맨 앞에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        """리스트 맨 뒤에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        """리스트 맨 앞 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        """리스트 맨 뒤 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        """주어진 노드를 리스트에서 제거한다. 탐색 없이 이웃 포인터만 재연결하므로 O(1)이다."""
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = None
+
+    def move_to_front(self, node: Node) -> None:
+        """주어진 노드를 리스트 맨 앞으로 이동한다. 탐색 없이 포인터만 재배치하므로 O(1)이다."""
+        if node is self.head:
+            return
+
+        if node.prev is not None:
+            node.prev.next = node.next
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = self.head
+
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+
+        self.head = node
+
+    def is_empty(self) -> bool:
+        """리스트가 비어 있는지 확인한다. head 존재 여부만 검사하므로 O(1)이다."""
+        return self.head is None
+
+    def __iter__(self) -> object:
+        """앞에서 뒤 순서로 데이터를 순회한다. 각 단계 이동은 O(1)이며 전체는 원소 수에 비례한다."""
+        current = self.head
+        while current is not None:
+            yield current.data
+            current = current.next
+[19:00:56]   작성 mini_redis/linked_list.py (121줄)
+
+----- write mini_redis/hashmap.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/hashmap.py
+from .linked_list import DoublyLinkedList, Node
+
+
+class HashMap:
+    """Chaining hash map using doubly linked lists for buckets."""
+
+    def __init__(self, initial_capacity: int = 8) -> None:
+        capacity = initial_capacity
+        if capacity < 1:
+            capacity = 8
+        self._capacity: int = capacity
+        self._size: int = 0
+        self._buckets: list[DoublyLinkedList] = [DoublyLinkedList() for _ in range(self._capacity)]
+
+    def _hash(self, key: str) -> int:
+        hash_value = 5381
+        for char in key:
+            hash_value = ((hash_value << 5) + hash_value) + ord(char)
+        return hash_value % self._capacity
+
+    def put(self, key: str, value: object) -> None:
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                current.data = (key, value)
+                return
+            current = current.next
+
+        bucket.insert_back((key, value))
+        self._size += 1
+
+        if self._size / self._capacity > 0.75:
+            self._resize()
+
+    def get(self, key: str) -> object | None:
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                return entry[1]
+            current = current.next
+
+        return None
+
+    def remove(self, key: str) -> bool:
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current: Node | None = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                bucket.remove_node(current)
+                self._size -= 1
+                return True
+            current = current.next
+
+        return False
+
+    def contains(self, key: str) -> bool:
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                return True
+            current = current.next
+
+        return False
+
+    def keys(self) -> list[str]:
+        result: list[str] = []
+        bucket_index = 0
+        while bucket_index < self._capacity:
+            current = self._buckets[bucket_index].head
+            while current is not None:
+                entry = current.data
+                result.append(entry[0])
+                current = current.next
+            bucket_index += 1
+        return result
+
+    def size(self) -> int:
+        return self._size
+
+    def _resize(self) -> None:
+        old_buckets = self._buckets
+        self._capacity *= 2
+        self._buckets = [DoublyLinkedList() for _ in range(self._capacity)]
+        old_size = self._size
+        self._size = 0
+
+        bucket_index = 0
+        old_bucket_count = len(old_buckets)
+        while bucket_index < old_bucket_count:
+            current = old_buckets[bucket_index].head
+            while current is not None:
+                entry = current.data
+                self.put(entry[0], entry[1])
+                current = current.next
+            bucket_index += 1
+
+        self._size = old_size
+
+
+[이 실행에서 방금 만든 파일 — 여기 적힌 이름과 호출 방식을 그대로 쓴다]
+### 방금 만든 파일 mini_redis/linked_list.py
+class Node:
+    """이중 연결 리스트의 노드이다."""
+
+    def __init__(self, data: object) -> None:
+        """데이터를 담는 노드를 초기화한다. 노드 생성은 포인터 대입만 수행하므로 O(1)이다."""
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """O(1) 포인터 재연결로 앞뒤 삽입, 삭제, 이동을 지원하는 이중 연결 리스트이다."""
+
+    def __init__(self) -> None:
+        """빈 리스트를 초기화한다. head와 tail 설정만 수행하므로 O(1)이다."""
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        """리스트 맨 앞에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        """리스트 맨 뒤에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        """리스트 맨 앞 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        """리스트 맨 뒤 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        """주어진 노드를 리스트에서 제거한다. 탐색 없이 이웃 포인터만 재연결하므로 O(1)이다."""
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+       
+[19:01:14] write      gpt-5.4        mini_redis/hashmap.py    입력   2084 출력  1394 차감   3478 누적    5472 (18초)
+
+----- write mini_redis/hashmap.py / 응답 / gpt-5.4 -----
+from .linked_list import DoublyLinkedList, Node
+
+
+class HashMap:
+    """이중 연결 리스트 체이닝으로 충돌을 해결하는 문자열 키 기반 해시맵이다."""
+
+    def __init__(self, initial_capacity: int = 8) -> None:
+        """초기 버킷 배열을 준비한다.
+
+        용량이 1 미만이면 너무 작은 테이블로 인한 즉시 리사이즈를 피하기 위해 기본값 8을 사용한다.
+        각 버킷을 독립적인 연결 리스트로 만들어 충돌 시에도 삽입과 삭제 규칙을 단순하게 유지한다.
+        """
+        capacity = initial_capacity
+        if capacity < 1:
+            capacity = 8
+        self._capacity: int = capacity
+        self._size: int = 0
+        self._buckets: list[DoublyLinkedList] = [DoublyLinkedList() for _ in range(self._capacity)]
+
+    def _hash(self, key: str) -> int:
+        """문자열 키를 현재 버킷 범위 안의 인덱스로 변환한다.
+
+        djb2는 구현이 단순하면서 문자열에 대해 비교적 고른 분산을 제공하므로
+        교육용 해시맵에서 해시 원리를 드러내기에 적합하다.
+        """
+        hash_value = 5381
+        for char in key:
+            hash_value = ((hash_value << 5) + hash_value) + ord(char)
+        return hash_value % self._capacity
+
+    def put(self, key: str, value: object) -> None:
+        """키에 값을 저장하거나 기존 키의 값을 갱신한다.
+
+        같은 키가 이미 있으면 항목 수를 늘리지 않고 값만 바꿔야
+        size와 로드 팩터가 실제 엔트리 개수를 정확히 반영한다.
+        새 키를 추가한 뒤 로드 팩터가 임계값을 넘으면 조회 성능 악화를 늦추기 위해 리사이즈한다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                current.data = (key, value)
+                return
+            current = current.next
+
+        bucket.insert_back((key, value))
+        self._size += 1
+
+        if self._size / self._capacity > 0.75:
+            self._resize()
+
+    def get(self, key: str) -> object | None:
+        """키에 대응하는 값을 반환하고, 없으면 None을 반환한다.
+
+        해시가 가리키는 버킷만 순회하도록 제한하는 이유는
+        전체 데이터를 매번 탐색하는 선형 비용을 피하기 위해서이다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                return entry[1]
+            current = current.next
+
+        return None
+
+    def remove(self, key: str) -> bool:
+        """키에 해당하는 항목을 제거하고 성공 여부를 반환한다.
+
+        체이닝 구조에서는 같은 버킷 안에서만 키를 찾으면 되며,
+        노드를 직접 제거할 수 있어 찾은 뒤의 삭제 비용을 O(1)로 유지할 수 있다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current: Node | None = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                bucket.remove_node(current)
+                self._size -= 1
+                return True
+            current = current.next
+
+        return False
+
+    def contains(self, key: str) -> bool:
+        """주어진 키의 존재 여부만 확인한다.
+
+        값을 꺼낼 필요가 없는 호출에서 get과 의도를 분리해 두면
+        None이 실제 저장값일 가능성과 미존재를 혼동하지 않게 된다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                return True
+            current = current.next
+
+        return False
+
+    def keys(self) -> list[str]:
+        """현재 저장된 모든 키를 리스트로 반환한다.
+
+        버킷 순서와 체이닝 순서를 그대로 따르는 이유는
+        추가 메모리나 정렬 비용 없이 테이블의 실제 저장 상태를 그대로 노출하기 위해서이다.
+        """
+        result: list[str] = []
+        bucket_index = 0
+        while bucket_index < self._capacity:
+            current = self._buckets[bucket_index].head
+            while current is not None:
+                entry = current.data
+                result.append(entry[0])
+                current = current.next
+            bucket_index += 1
+        return result
+
+    def size(self) -> int:
+        """현재 해시맵에 저장된 고유 키의 개수를 반환한다.
+
+        호출마다 다시 세지 않고 누적 값을 유지하는 이유는
+        크기 조회가 자주 일어나도 항상 O(1)로 응답하기 위해서이다.
+        """
+        return self._size
+
+    def _resize(self) -> None:
+        """버킷 배열을 두 배로 확장하고 기존 엔트리를 새 버킷에 재배치한다.
+
+        리사이즈 중에는 모든 엔트리가 이미 고유 키라는 사실이 보장되므로
+        put을 다시 호출해 중복 키 탐색을 반복할 이유가 없다.
+        새 해시값에 맞는 버킷 뒤에 바로 삽입하면 전체 리해싱을 O(N)으로 유지할 수 있다.
+        """
+        old_buckets = self._buckets
+        old_capacity = self._capacity
+
+        self._capacity *= 2
+        self._buckets = [DoublyLinkedList() for _ in range(self._capacity)]
+
+        bucket_index = 0
+        while bucket_index < old_capacity:
+            current = old_buckets[bucket_index].head
+            while current is not None:
+                entry = current.data
+                self._buckets[self._hash(entry[0])].insert_back(entry)
+                current = current.next
+            bucket_index += 1
+[19:01:14]   작성 mini_redis/hashmap.py (156줄)
+
+----- write mini_redis/heap.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/heap.py
+class MinHeap:
+    """Array-based min-heap for (expire_at, key) tuples."""
+
+    def __init__(self) -> None:
+        self._data: list[tuple[float, str]] = []
+
+    def push(self, item: tuple[float, str]) -> None:
+        self._data.append(item)
+        self._heapify_up(len(self._data) - 1)
+
+    def pop(self) -> tuple[float, str] | None:
+        if not self._data:
+            return None
+        if len(self._data) == 1:
+            return self._data.pop()
+
+        root: tuple[float, str] = self._data[0]
+        last: tuple[float, str] = self._data.pop()
+        self._data[0] = last
+        self._heapify_down(0)
+        return root
+
+    def peek(self) -> tuple[float, str] | None:
+        if not self._data:
+            return None
+        return self._data[0]
+
+    def size(self) -> int:
+        return len(self._data)
+
+    def _heapify_up(self, index: int) -> None:
+        while index > 0:
+            parent: int = (index - 1) // 2
+            if self._data[index] < self._data[parent]:
+                self._data[index], self._data[parent] = self._data[parent], self._data[index]
+                index = parent
+            else:
+                break
+
+    def _heapify_down(self, index: int) -> None:
+        length: int = len(self._data)
+
+        while True:
+            left: int = index * 2 + 1
+            right: int = index * 2 + 2
+            smallest: int = index
+
+            if left < length and self._data[left] < self._data[smallest]:
+                smallest = left
+            if right < length and self._data[right] < self._data[smallest]:
+                smallest = right
+
+            if smallest == index:
+                break
+
+            self._data[index], self._data[smallest] = self._data[smallest], self._data[index]
+            index = smallest
+
+
+[이 실행에서 방금 만든 파일 — 여기 적힌 이름과 호출 방식을 그대로 쓴다]
+### 방금 만든 파일 mini_redis/linked_list.py
+class Node:
+    """이중 연결 리스트의 노드이다."""
+
+    def __init__(self, data: object) -> None:
+        """데이터를 담는 노드를 초기화한다. 노드 생성은 포인터 대입만 수행하므로 O(1)이다."""
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """O(1) 포인터 재연결로 앞뒤 삽입, 삭제, 이동을 지원하는 이중 연결 리스트이다."""
+
+    def __init__(self) -> None:
+        """빈 리스트를 초기화한다. head와 tail 설정만 수행하므로 O(1)이다."""
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        """리스트 맨 앞에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        """리스트 맨 뒤에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        """리스트 맨 앞 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        """리스트 맨 뒤 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        """주어진 노드를 리스트에서 제거한다. 탐색 없이 이웃 포인터만 재연결하므로 O(1)이다."""
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = None
+
+    def move_to_front(self, node: Node) -> None:
+        """주어진 노드를 리스트 맨 앞으로 이동한다. 탐색 없이 포인터만 재배치하므로 O(1)이다."""
+        i
+
+### 방금 만든 파일 mini_redis/hashmap.py
+from .linked_list import DoublyLinkedList, Node
+
+
+class HashMap:
+    """이중 연결 리스트 체이닝으로 충돌을 해결하는 문자열 키 기반 해시맵이다."""
+
+    def __init__(self, initial_capacity: int = 8) -> None:
+        """초기 버킷 배열을 준비한다.
+
+        용량이 1 미만이면 너무 작은 테이블로 인한 즉시 리사이즈를 피하기 위해 기본값 8을 사용한다.
+        각 버킷을 독립적인 연결 리스트로 만들어 충돌 시에도 삽입과 삭제 규칙을 단순하게 유지한다.
+        """
+        capacity = initial_capacity
+        if capacity < 1:
+            capacity = 8
+        self._capacity: int = capacity
+        self._size: int = 0
+        self._buckets: list[DoublyLinkedList] = [DoublyLinkedList() for _ in range(self._capacity)]
+
+    def _hash(self, key: str) -> int:
+        """문자열 키를 현재 버킷 범위 안의 인덱스로 변환한다.
+
+        djb2는 구현이 단순하면서 문자열에 대해 비교적 고른 분산을 제공하므로
+        교육용 해시맵에서 해시 원리를 드러내기에 적합하다.
+        """
+        hash_value = 5381
+        for char in key:
+            hash_value = ((hash_value << 5) + hash_value) + ord(char)
+        return hash_value % self._capacity
+
+    def put(self, key: str, value: object) -> None:
+        """키에 값을 저장하거나 기존 키의 값을 갱신한다.
+
+        같은 키가 이미 있으면 항목 수를 늘리지 않고 값만 바꿔야
+        size와 로드 팩터가 실제 엔트리 개수를 정확히 반영한다.
+        새 키를 추가한 뒤 로드 팩터가 임계값을 넘으면 조회 성능 악화를 늦추기 위해 리사이즈한다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = curr
+[19:01:27] write      gpt-5.4        mini_redis/heap.py       입력   2471 출력   992 차감   3463 누적    8935 (13초)
+
+----- write mini_redis/heap.py / 응답 / gpt-5.4 -----
+class MinHeap:
+    """TTL 만료 시각이 가장 이른 항목을 빠르게 찾기 위한 배열 기반 최소 힙이다."""
+
+    def __init__(self) -> None:
+        """빈 최소 힙을 초기화한다.
+
+        내부 저장소를 빈 배열로 준비만 하므로 시간 복잡도는 O(1)이다.
+        """
+        self._data: list[tuple[float, str]] = []
+
+    def push(self, item: tuple[float, str]) -> None:
+        """새 (expire_at, key) 항목을 힙에 삽입한다.
+
+        새 항목은 배열 끝에 추가한 뒤 부모와 비교하며 위로 올려
+        가장 작은 만료 시각이 루트에 오도록 힙 속성을 복구한다.
+        시간 복잡도는 최악의 경우 힙 높이에 비례하는 O(log n)이다.
+        """
+        self._data.append(item)
+        self._heapify_up(len(self._data) - 1)
+
+    def pop(self) -> tuple[float, str] | None:
+        """루트에 있는 최소 항목을 제거하고 반환한다.
+
+        힙이 비어 있으면 None을 반환한다.
+        루트를 꺼낸 뒤 마지막 항목을 루트로 옮기고 아래로 내려 보내
+        최소 힙 조건을 다시 만족시킨다.
+        시간 복잡도는 원소가 있을 때 최악의 경우 O(log n)이며,
+        빈 힙 검사와 단일 원소 처리만 필요한 경우는 O(1)이다.
+        """
+        if not self._data:
+            return None
+        if len(self._data) == 1:
+            return self._data.pop()
+
+        root: tuple[float, str] = self._data[0]
+        last: tuple[float, str] = self._data.pop()
+        self._data[0] = last
+        self._heapify_down(0)
+        return root
+
+    def peek(self) -> tuple[float, str] | None:
+        """루트의 최소 항목을 제거하지 않고 반환한다.
+
+        가장 빠른 만료 대상을 확인만 해야 할 때 재정렬 비용을 피하기 위해
+        배열의 첫 원소만 읽는다.
+        시간 복잡도는 O(1)이다.
+        """
+        if not self._data:
+            return None
+        return self._data[0]
+
+    def size(self) -> int:
+        """현재 힙에 저장된 항목 수를 반환한다.
+
+        배열 길이 정보만 읽으면 되므로 시간 복잡도는 O(1)이다.
+        """
+        return len(self._data)
+
+    def _heapify_up(self, index: int) -> None:
+        """주어진 인덱스의 항목을 위로 이동시켜 힙 속성을 복구한다.
+
+        삽입 직후에는 새 항목 하나만 부모보다 작을 수 있으므로
+        필요한 동안 부모와 교환하며 위로 올리는 편이 가장 단순하고 효율적이다.
+        시간 복잡도는 최악의 경우 힙 높이에 비례하는 O(log n)이다.
+        """
+        while index > 0:
+            parent: int = (index - 1) // 2
+            if self._data[index] < self._data[parent]:
+                self._data[index], self._data[parent] = self._data[parent], self._data[index]
+                index = parent
+            else:
+                break
+
+    def _heapify_down(self, index: int) -> None:
+        """주어진 인덱스의 항목을 아래로 이동시켜 힙 속성을 복구한다.
+
+        루트 교체 뒤에는 현재 항목이 자식보다 클 수 있으므로
+        두 자식 중 더 작은 쪽과 교환하며 내려 보내야 전체 최소 힙 조건을 유지할 수 있다.
+        시간 복잡도는 최악의 경우 힙 높이에 비례하는 O(log n)이다.
+        """
+        length: int = len(self._data)
+
+        while True:
+            left: int = index * 2 + 1
+            right: int = index * 2 + 2
+            smallest: int = index
+
+            if left < length and self._data[left] < self._data[smallest]:
+                smallest = left
+            if right < length and self._data[right] < self._data[smallest]:
+                smallest = right
+
+            if smallest == index:
+                break
+
+            self._data[index], self._data[smallest] = self._data[smallest], self._data[index]
+            index = smallest
+[19:01:27]   작성 mini_redis/heap.py (97줄)
+
+----- write mini_redis/store.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/store.py
+import math
+import time
+
+from .errors import OOMError
+from .hashmap import HashMap
+from .heap import MinHeap
+from .linked_list import DoublyLinkedList, Node
+
+
+class MiniRedisStore:
+    """Core storage engine combining hashmap, LRU list, and TTL heap."""
+
+    def __init__(self, now_fn: 'object' = None) -> None:
+        self._now_fn = now_fn if now_fn is not None else time.time
+
+        self._data: HashMap = HashMap()
+        self._ttl_map: HashMap = HashMap()
+        self._lru_nodes: HashMap = HashMap()
+        self._lru_list: DoublyLinkedList = DoublyLinkedList()
+        self._ttl_heap: MinHeap = MinHeap()
+
+        self._used_memory: int = 0
+        self._maxmemory: int = 0
+        self._evicted_keys: int = 0
+
+    def set(self, key: str, value: str) -> None:
+        self._purge_expired()
+
+        new_entry_size = self._entry_size(key, value)
+        if self._maxmemory > 0 and new_entry_size > self._maxmemory:
+            raise OOMError()
+
+        old_value = self._data.get(key)
+        old_exists = old_value is not None
+
+        if old_exists:
+            self._used_memory -= self._entry_size(key, old_value)
+
+        self._data.put(key, value)
+        self._used_memory += new_entry_size
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is None:
+            new_node = self._lru_list.insert_front(key)
+            self._lru_nodes.put(key, new_node)
+        else:
+            self._lru_list.move_to_front(lru_node)
+
+        try:
+            self._evict_if_needed()
+        except OOMError:
+            if self._data.contains(key):
+                self._delete_key_internal(key)
+            raise
+
+    def get(self, key: str) -> str | None:
+        if self._is_expired(key):
+            return None
+
+        value = self._data.get(key)
+        if value is None:
+            return None
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.move_to_front(lru_node)
+
+        return value
+
+    def delete(self, key: str) -> int:
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        self._delete_key_internal(key)
+        return 1
+
+    def exists(self, key: str) -> int:
+        if self._is_expired(key):
+            return 0
+        if self._data.contains(key):
+            return 1
+        return 0
+
+    def dbsize(self) -> int:
+        self._purge_expired()
+        return self._data.size()
+
+    def keys(self) -> list[str]:
+        self._purge_expired()
+        return self._data.keys()
+
+    def set_maxmemory(self, bytes_limit: int) -> None:
+        self._maxmemory = bytes_limit
+        self._purge_expired()
+        self._evict_if_needed()
+
+    def info_memory(self) -> tuple[int, int, int]:
+        self._purge_expired()
+        return (self._used_memory, self._maxmemory, self._evicted_keys)
+
+    def expire(self, key: str, seconds: int) -> int:
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        if seconds <= 0:
+            self._delete_key_internal(key)
+            return 1
+
+        expire_at = float(self._now_fn()) + float(seconds)
+        self._ttl_map.put(key, expire_at)
+        self._ttl_heap.push((expire_at, key))
+        return 1
+
+    def ttl(self, key: str) -> int:
+        if self._is_expired(key):
+            return -2
+
+        if not self._data.contains(key):
+            return -2
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return -1
+
+        remaining = max(0, int(math.ceil(expire_at - float(self._now_fn()))))
+        return remaining
+
+    def _is_expired(self, key: str) -> bool:
+        self._purge_expired()
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return False
+
+        now = float(self._now_fn())
+        if expire_at <= now:
+            self._delete_key_internal(key)
+            return True
+
+        return False
+
+    def _evict_if_needed(self) -> None:
+        self._purge_expired()
+
+        if self._maxmemory <= 0:
+            return
+
+        while self._used_memory > self._maxmemory:
+            lru_key = self._lru_list.remove_back()
+            if lru_key is None:
+                raise OOMError()
+
+            self._lru_nodes.remove(lru_key)
+            if self._data.contains(lru_key):
+                value = self._data.get(lru_key)
+                if value is not None:
+                    self._used_memory -= self._entry_size(lru_key, value)
+                self._data.remove(lru_key)
+                if self._ttl_map.contains(lru_key):
+                    self._ttl_map.remove(lru_key)
+                self._evicted_keys += 1
+
+    def _entry_size(self, key: str, value: str) -> int:
+        return len(key.encode("utf-8")) + len(value.encode("utf-8"))
+
+    def _delete_key_internal(self, key: str) -> None:
+        value = self._data.get(key)
+        if value is not None:
+            self._used_memory -= self._entry_size(key, value)
+            self._data.remove(key)
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.remove_node(lru_node)
+            self._lru_nodes.remove(key)
+
+    def _purge_expired(self) -> None:
+        now = float(self._now_fn())
+
+        while self._ttl_heap.size() > 0:
+            item = self._ttl_heap.peek()
+            if item is None:
+                return
+
+            expire_at, key = item
+            if expire_at > now:
+                return
+
+            self._ttl_heap.pop()
+            current_expire_at = self._ttl
+[19:02:08] write      gpt-5.4        mini_redis/store.py      입력   4381 출력  3500 차감   7881 누적   16816 (41초)
+
+----- write mini_redis/store.py / 응답 / gpt-5.4 -----
+import math
+import time
+
+from .errors import OOMError
+from .hashmap import HashMap
+from .heap import MinHeap
+from .linked_list import DoublyLinkedList, Node
+
+
+class MiniRedisStore:
+    """해시맵, LRU 연결 리스트, TTL 최소 힙을 결합한 Mini Redis 저장소 엔진이다."""
+
+    def __init__(self, now_fn: 'object' = None) -> None:
+        """저장소의 핵심 상태를 초기화한다.
+
+        테스트에서 시간을 고정하거나 제어할 수 있어야 TTL 동작을 안정적으로 검증할 수 있으므로
+        현재 시각 공급 함수를 주입 가능하게 둔다. 실제 데이터, TTL 인덱스, LRU 노드 참조를
+        각각 분리해 보관하는 이유는 조회는 빠르게 유지하면서도 만료와 축출을 서로 독립적으로
+        처리하기 위해서이다. 최대 메모리가 0이면 제한 없음으로 간주하며, 축출 통계는 이후의
+        메모리 정책 검증을 위해 누적 카운터로 유지한다.
+        """
+        self._now_fn = now_fn if now_fn is not None else time.time
+
+        self._data: HashMap = HashMap()
+        self._ttl_map: HashMap = HashMap()
+        self._lru_nodes: HashMap = HashMap()
+        self._lru_list: DoublyLinkedList = DoublyLinkedList()
+        self._ttl_heap: MinHeap = MinHeap()
+
+        self._used_memory: int = 0
+        self._maxmemory: int = 0
+        self._evicted_keys: int = 0
+
+    def set(self, key: str, value: str) -> None:
+        """키에 값을 저장하고 필요하면 TTL 제거와 LRU 갱신, 메모리 축출을 수행한다.
+
+        쓰기 직전에 만료 데이터를 먼저 정리해야 메모리 계산과 축출 판단이 오래된 상태에
+        오염되지 않는다. 새 엔트리 하나가 최대 메모리보다 큰 경우는 어떤 축출로도 수용할 수
+        없으므로 즉시 OOMError를 발생시킨다. 기존 키를 덮어쓸 때는 이전 값의 메모리만큼 먼저
+        차감해야 사용량이 실제 바이트 수와 일치한다. SET은 기존 TTL을 제거하는 Redis 계열
+        동작을 따르므로 ttl_map에서 키를 삭제한다. 접근 순서를 최신으로 만들기 위해 LRU 리스트
+        맨 앞으로 이동시키며, 삽입 후 메모리 제한을 넘으면 LRU 기준으로 축출한다. 다만 축출
+        과정에서 방금 쓴 키까지 제거되어도 제한을 만족할 수 없는 경우가 있으므로, 예외가
+        발생하면 부분적으로 남은 흔적을 정리해 저장소 상태를 일관되게 되돌린 뒤 예외를 다시
+        전달한다.
+        """
+        self._purge_expired()
+
+        new_entry_size = self._entry_size(key, value)
+        if self._maxmemory > 0 and new_entry_size > self._maxmemory:
+            raise OOMError()
+
+        old_value = self._data.get(key)
+        old_exists = old_value is not None
+
+        if old_exists:
+            self._used_memory -= self._entry_size(key, old_value)
+
+        self._data.put(key, value)
+        self._used_memory += new_entry_size
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is None:
+            new_node = self._lru_list.insert_front(key)
+            self._lru_nodes.put(key, new_node)
+        else:
+            self._lru_list.move_to_front(lru_node)
+
+        try:
+            self._evict_if_needed()
+        except OOMError:
+            if self._data.contains(key):
+                self._delete_key_internal(key)
+            raise
+
+    def get(self, key: str) -> str | None:
+        """키 값을 조회하고 존재하면 LRU 순서를 최신으로 갱신한다.
+
+        조회 전에 만료 여부를 확인해야 이미 시한이 지난 데이터를 읽는 문제를 막을 수 있다.
+        TTL이 지난 키는 조회 성공이 아니라 없는 키처럼 None을 반환한다. 값이 실제로 존재할 때만
+        LRU 리스트의 맨 앞으로 이동시키는 이유는 최근 사용 정책이 읽기 접근을 반영해야 이후
+        메모리 압박 시 덜 최근의 키가 우선 축출되도록 하기 위해서이다.
+        """
+        if self._is_expired(key):
+            return None
+
+        value = self._data.get(key)
+        if value is None:
+            return None
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.move_to_front(lru_node)
+
+        return value
+
+    def delete(self, key: str) -> int:
+        """키를 삭제하고 실제로 제거했으면 1, 없으면 0을 반환한다.
+
+        TTL이 이미 지난 키는 논리적으로 존재하지 않는 것으로 취급해야 하므로 먼저 만료 여부를
+        확인한다. 저장소에 없는 키를 지우려 할 때 0을 반환하는 것은 호출자가 삭제 성공 여부를
+        구분할 수 있게 하기 위함이다. 실제 삭제는 데이터, TTL, LRU 참조를 함께 정리하는 내부
+        루틴으로 위임해 중복 로직으로 인한 상태 불일치를 막는다.
+        """
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        self._delete_key_internal(key)
+        return 1
+
+    def exists(self, key: str) -> int:
+        """키가 현재 유효하게 존재하면 1, 아니면 0을 반환한다.
+
+        단순 존재 검사라도 TTL을 무시하면 만료된 키가 살아 있는 것처럼 보일 수 있으므로
+        먼저 만료 정리를 거친다. 반환값을 불리언이 아니라 정수로 유지하는 이유는 Redis류
+        명령 결과 형식과 맞추기 위해서이다.
+        """
+        if self._is_expired(key):
+            return 0
+        if self._data.contains(key):
+            return 1
+        return 0
+
+    def dbsize(self) -> int:
+        """만료를 반영한 현재 데이터 개수를 반환한다.
+
+        크기 조회 전에 만료 키를 제거해야 호출 시점의 논리적 데이터 수와 내부 저장 수가
+        어긋나지 않는다. 별도 카운터 대신 해시맵 size를 그대로 사용하는 것은 실제 엔트리
+        상태를 단일 진실 원천으로 유지하기 위해서이다.
+        """
+        self._purge_expired()
+        return self._data.size()
+
+    def keys(self) -> list[str]:
+        """만료를 반영한 현재 키 목록을 반환한다.
+
+        만료된 키가 목록에 섞이면 존재 검사나 TTL 결과와 모순되므로 먼저 만료를 정리한다.
+        이후 해시맵이 보유한 키 집합을 그대로 반환해 현재 시점의 논리적 데이터 스냅샷을 제공한다.
+        """
+        self._purge_expired()
+        return self._data.keys()
+
+    def set_maxmemory(self, bytes_limit: int) -> None:
+        """최대 메모리 제한을 설정하고 필요하면 즉시 축출을 수행한다.
+
+        제한값이 바뀐 뒤 나중까지 초과 상태를 방치하면 이후 연산의 의미가 불명확해지므로
+        설정 직후 현재 상태를 새 정책에 맞춘다. 먼저 만료 키를 정리하는 이유는 살아 있는
+        데이터만으로 실제 초과 여부를 판단해야 불필요한 LRU 축출을 줄일 수 있기 때문이다.
+        0 이하가 들어오면 제한 없음처럼 동작하도록 _evict_if_needed의 규칙에 위임한다.
+        """
+        self._maxmemory = bytes_limit
+        self._purge_expired()
+        self._evict_if_needed()
+
+    def info_memory(self) -> tuple[int, int, int]:
+        """메모리 사용량, 최대 메모리, 누적 축출 수를 반환한다.
+
+        통계 조회라도 만료 데이터를 포함한 사용량은 현재 상태를 왜곡하므로 먼저 정리한다.
+        반환 튜플의 순서를 고정하는 이유는 호출자가 별도 키 이름 없이도 예측 가능하게
+        파싱할 수 있어야 하기 때문이다.
+        """
+        self._purge_expired()
+        return (self._used_memory, self._maxmemory, self._evicted_keys)
+
+    def expire(self, key: str, seconds: int) -> int:
+        """키에 TTL을 설정하고 성공 시 1, 실패 시 0을 반환한다.
+
+        이미 만료된 키나 존재하지 않는 키에는 TTL을 설정할 수 없으므로 0을 반환한다.
+        seconds가 0 이하이면 미래 시각을 저장하는 대신 즉시 삭제로 처리해야 호출자의 의도인
+        즉시 만료가 명확하게 반영된다. 양수 TTL은 현재 시각에 더해 절대 만료 시각으로 저장하며,
+        힙에는 같은 키의 과거 TTL 기록이 남을 수 있다. 그 중복을 즉시 제거하지 않는 이유는
+        힙 내부 임의 삭제보다 삽입과 지연 정리가 단순하고 안전하기 때문이다. 이후 purge 단계에서
+        ttl_map의 최신 값과 대조해 오래된 힙 항목을 무시한다.
+        """
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        if seconds <= 0:
+            self._delete_key_internal(key)
+            return 1
+
+        expire_at = float(self._now_fn()) + float(seconds)
+        self._ttl_map.put(key, expire_at)
+        self._ttl_heap.push((expire_at, key))
+        return 1
+
+    def ttl(self, key: str) -> int:
+        """키의 남은 TTL을 정수 초로 반환한다.
+
+        키가 없거나 조회 시점에 이미 만료되었으면 -2를 반환하고, TTL이 설정되지 않았으면 -1을
+        반환한다. 이 구분은 호출자가 키 부재와 영속 키를 다르게 처리할 수 있게 하기 위해 필요하다.
+        남은 시간은 ceil을 사용해 올림하는데, 이는 아직 유효한 잔여 시간을 0으로 과소평가하지 않게
+        하려는 선택이다. 다만 음수는 0으로 보정해 경계 시각 직전의 부동소수 오차가 사용자에게
+        혼란스러운 음수 TTL로 보이지 않게 한다.
+        """
+        if self._is_expired(key):
+            return -2
+
+        if not self._data.contains(key):
+            return -2
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return -1
+
+        remaining = max(0, int(math.ceil(expire_at - float(self._now_fn()))))
+        return remaining
+
+    def _is_expired(self, key: str) -> bool:
+        """주어진 키가 현재 시각 기준으로 만료되었는지 확인한다.
+
+        먼저 전역 purge를 수행하는 이유는 힙에 쌓인 더 이른 만료 항목들을 선행 정리해
+        저장소 전체 상태를 최신화하기 위해서이다. 이후 ttl_map에서 해당 키의 현재 만료 시각을
+        읽어 직접 비교한다. 이중 확인이 필요한 이유는 힙에 남은 오래된 TTL 기록만으로는
+        현재 키의 실제 만료 상태를 단정할 수 없기 때문이다. 만료가 확인되면 즉시 내부 삭제를
+        수행해 이후 같은 키에 대한 연산이 일관되게 없는 키처럼 동작하도록 만든다.
+        """
+        self._purge_expired()
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return False
+
+        now = float(self._now_fn())
+        if expire_at <= now:
+            self._delete_key_internal(key)
+            return True
+
+        return False
+
+    def _evict_if_needed(self) -> None:
+        """사용 메모리가 제한을 넘는 동안 LRU 기준으로 키를 축출한다.
+
+        축출 전에 만료 키를 먼저 제거해야 실제 살아 있는 데이터만으로 메모리 부족 여부를
+        판단할 수 있다. 최대 메모리가 0 이하이면 제한이 없으므로 아무 동작도 하지 않는다.
+        초과 상태가 해소될 때까지 LRU 리스트의 뒤쪽, 즉 가장 오래 사용되지 않은 키부터 제거한다.
+        리스트와 해시맵, TTL 인덱스를 함께 정리해야 이후 조회와 만료 처리에서 유령 엔트리가
+        남지 않는다. 만약 메모리는 초과했는데 제거할 LRU 노드가 없으면 내부 상태가 이미
+        모순된 것이므로 조용히 넘어가지 않고 OOMError를 발생시켜 문제를 드러낸다. 축출된 키 수는
+        정책 효과를 관찰할 수 있도록 누적 통계에 반영한다.
+        """
+        self._purge_expired()
+
+        if self._maxmemory <= 0:
+            return
+
+        while self._used_memory > self._maxmemory:
+            lru_key = self._lru_list.remove_back()
+            if lru_key is None:
+                raise OOMError()
+
+            self._lru_nodes.remove(lru_key)
+            if self._data.contains(lru_key):
+                value = self._data.get(lru_key)
+                if value is not None:
+                    self._used_memory -= self._entry_size(lru_key, value)
+                self._data.remove(lru_key)
+                if self._ttl_map.contains(lru_key):
+                    self._ttl_map.remove(lru_key)
+                self._evicted_keys += 1
+
+    def _entry_size(self, key: str, value: str) -> int:
+        """키와 값의 UTF-8 바이트 길이 합으로 엔트리 메모리 크기를 계산한다.
+
+        문자열의 문자 수가 아니라 바이트 수를 사용해야 한글 등 멀티바이트 문자가 포함된 경우에도
+        실제 저장 비용에 더 가까운 추정을 할 수 있다. 객체 헤더나 인덱스 오버헤드는 제외하는데,
+        이 저장소의 메모리 정책을 단순하고 결정적으로 유지하기 위해서이다.
+        """
+        return len(key.encode("utf-8")) + len(value.encode("utf-8"))
+
+    def _delete_key_internal(self, key: str) -> None:
+        """키와 관련된 데이터, TTL, LRU 상태를 내부적으로 모두 제거한다.
+
+        삭제 로직이 여러 공개 메서드에 흩어지면 메모리 차감이나 LRU 노드 제거 중 하나가 빠져
+        상태 불일치가 생기기 쉽기 때문에 공통 루틴으로 묶는다. 값이 실제로 존재할 때만 메모리를
+        차감하는 이유는 중복 삭제 호출에도 사용량이 음수로 흐트러지지 않게 하기 위해서이다.
+        TTL 정보와 LRU 노드 참조도 함께 제거해야 이후 purge나 move 동작이 이미 사라진 키를
+        다시 만지지 않게 된다.
+        """
+        value = self._data.get(key)
+        if value is not None:
+            self._used_memory -= self._entry_size(key, value)
+            self._data.remove(key)
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.remove_node(lru_node)
+            self._lru_nodes.remove(key)
+
+    def _purge_expired(self) -> None:
+        """TTL 힙을 이용해 현재 시각까지 만료된 키를 지연 정리한다.
+
+
+[19:02:08]   검사 실패(1차): 파이썬 문법 오류: unterminated triple-quoted string literal (detected at line 303) (303행)
+[19:02:08]   출력이 잘렸다. 상한을 5000 로 올려 다시 요청한다
+
+----- write mini_redis/store.py 재시도 / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/store.py
+import math
+import time
+
+from .errors import OOMError
+from .hashmap import HashMap
+from .heap import MinHeap
+from .linked_list import DoublyLinkedList, Node
+
+
+class MiniRedisStore:
+    """Core storage engine combining hashmap, LRU list, and TTL heap."""
+
+    def __init__(self, now_fn: 'object' = None) -> None:
+        self._now_fn = now_fn if now_fn is not None else time.time
+
+        self._data: HashMap = HashMap()
+        self._ttl_map: HashMap = HashMap()
+        self._lru_nodes: HashMap = HashMap()
+        self._lru_list: DoublyLinkedList = DoublyLinkedList()
+        self._ttl_heap: MinHeap = MinHeap()
+
+        self._used_memory: int = 0
+        self._maxmemory: int = 0
+        self._evicted_keys: int = 0
+
+    def set(self, key: str, value: str) -> None:
+        self._purge_expired()
+
+        new_entry_size = self._entry_size(key, value)
+        if self._maxmemory > 0 and new_entry_size > self._maxmemory:
+            raise OOMError()
+
+        old_value = self._data.get(key)
+        old_exists = old_value is not None
+
+        if old_exists:
+            self._used_memory -= self._entry_size(key, old_value)
+
+        self._data.put(key, value)
+        self._used_memory += new_entry_size
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is None:
+            new_node = self._lru_list.insert_front(key)
+            self._lru_nodes.put(key, new_node)
+        else:
+            self._lru_list.move_to_front(lru_node)
+
+        try:
+            self._evict_if_needed()
+        except OOMError:
+            if self._data.contains(key):
+                self._delete_key_internal(key)
+            raise
+
+    def get(self, key: str) -> str | None:
+        if self._is_expired(key):
+            return None
+
+        value = self._data.get(key)
+        if value is None:
+            return None
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.move_to_front(lru_node)
+
+        return value
+
+    def delete(self, key: str) -> int:
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        self._delete_key_internal(key)
+        return 1
+
+    def exists(self, key: str) -> int:
+        if self._is_expired(key):
+            return 0
+        if self._data.contains(key):
+            return 1
+        return 0
+
+    def dbsize(self) -> int:
+        self._purge_expired()
+        return self._data.size()
+
+    def keys(self) -> list[str]:
+        self._purge_expired()
+        return self._data.keys()
+
+    def set_maxmemory(self, bytes_limit: int) -> None:
+        self._maxmemory = bytes_limit
+        self._purge_expired()
+        self._evict_if_needed()
+
+    def info_memory(self) -> tuple[int, int, int]:
+        self._purge_expired()
+        return (self._used_memory, self._maxmemory, self._evicted_keys)
+
+    def expire(self, key: str, seconds: int) -> int:
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        if seconds <= 0:
+            self._delete_key_internal(key)
+            return 1
+
+        expire_at = float(self._now_fn()) + float(seconds)
+        self._ttl_map.put(key, expire_at)
+        self._ttl_heap.push((expire_at, key))
+        return 1
+
+    def ttl(self, key: str) -> int:
+        if self._is_expired(key):
+            return -2
+
+        if not self._data.contains(key):
+            return -2
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return -1
+
+        remaining = max(0, int(math.ceil(expire_at - float(self._now_fn()))))
+        return remaining
+
+    def _is_expired(self, key: str) -> bool:
+        self._purge_expired()
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return False
+
+        now = float(self._now_fn())
+        if expire_at <= now:
+            self._delete_key_internal(key)
+            return True
+
+        return False
+
+    def _evict_if_needed(self) -> None:
+        self._purge_expired()
+
+        if self._maxmemory <= 0:
+            return
+
+        while self._used_memory > self._maxmemory:
+            lru_key = self._lru_list.remove_back()
+            if lru_key is None:
+                raise OOMError()
+
+            self._lru_nodes.remove(lru_key)
+            if self._data.contains(lru_key):
+                value = self._data.get(lru_key)
+                if value is not None:
+                    self._used_memory -= self._entry_size(lru_key, value)
+                self._data.remove(lru_key)
+                if self._ttl_map.contains(lru_key):
+                    self._ttl_map.remove(lru_key)
+                self._evicted_keys += 1
+
+    def _entry_size(self, key: str, value: str) -> int:
+        return len(key.encode("utf-8")) + len(value.encode("utf-8"))
+
+    def _delete_key_internal(self, key: str) -> None:
+        value = self._data.get(key)
+        if value is not None:
+            self._used_memory -= self._entry_size(key, value)
+            self._data.remove(key)
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.remove_node(lru_node)
+            self._lru_nodes.remove(key)
+
+    def _purge_expired(self) -> None:
+        now = float(self._now_fn())
+
+        while self._ttl_heap.size() > 0:
+            item = self._ttl_heap.peek()
+            if item is None:
+                return
+
+            expire_at, key = item
+            if expire_at > now:
+                return
+
+            self._ttl_heap.pop()
+            current_expire_at = self._ttl
+[19:02:44] write      gpt-5.4        mini_redis/store.py 재시도  입력   4428 출력  3280 차감   7708 누적   24524 (36초)
+
+----- write mini_redis/store.py 재시도 / 응답 / gpt-5.4 -----
+import math
+import time
+
+from .errors import OOMError
+from .hashmap import HashMap
+from .heap import MinHeap
+from .linked_list import DoublyLinkedList, Node
+
+
+class MiniRedisStore:
+    """해시맵, LRU 리스트, TTL 최소 힙을 결합한 핵심 저장소 엔진이다."""
+
+    def __init__(self, now_fn: 'object' = None) -> None:
+        """저장소의 모든 인덱스와 통계를 초기화한다.
+
+        테스트에서는 시간을 고정해야 TTL 동작을 안정적으로 검증할 수 있으므로
+        외부에서 현재 시각 함수를 주입할 수 있게 둔다.
+        데이터 본문, TTL 정보, LRU 노드 참조를 분리해 저장하는 이유는
+        조회/만료/축출을 각각 필요한 구조에서 O(1) 또는 로그 시간으로 처리하기 위해서이다.
+        """
+        self._now_fn = now_fn if now_fn is not None else time.time
+
+        self._data: HashMap = HashMap()
+        self._ttl_map: HashMap = HashMap()
+        self._lru_nodes: HashMap = HashMap()
+        self._lru_list: DoublyLinkedList = DoublyLinkedList()
+        self._ttl_heap: MinHeap = MinHeap()
+
+        self._used_memory: int = 0
+        self._maxmemory: int = 0
+        self._evicted_keys: int = 0
+
+    def set(self, key: str, value: str) -> None:
+        """키에 값을 저장하고 필요하면 LRU와 메모리 상태를 갱신한다.
+
+        쓰기 전에 먼저 만료된 키를 정리해야 이미 사용 불가능한 데이터가
+        메모리를 계속 점유하며 잘못된 OOM 판단을 만드는 일을 막을 수 있다.
+        기존 키를 덮어쓸 때는 이전 값의 크기를 먼저 차감해 실제 사용량을 정확히 유지한다.
+        SET은 기존 TTL을 제거하는 Redis 계열 규칙을 따르므로 저장 성공 후 TTL 맵에서 지운다.
+        마지막으로 키를 LRU 최전방으로 이동시키고, 메모리 제한을 넘으면 후순위 키를 축출한다.
+        새 항목 하나만으로도 제한을 절대 만족시킬 수 없는 경우는 축출로 해결할 수 없으므로 OOMError를 발생시킨다.
+        축출 도중 실패하면 방금 넣은 키를 롤백해 부분 반영 상태를 남기지 않는다.
+        """
+        self._purge_expired()
+
+        new_entry_size = self._entry_size(key, value)
+        if self._maxmemory > 0 and new_entry_size > self._maxmemory:
+            raise OOMError()
+
+        old_value = self._data.get(key)
+        old_exists = old_value is not None
+
+        if old_exists:
+            self._used_memory -= self._entry_size(key, old_value)
+
+        self._data.put(key, value)
+        self._used_memory += new_entry_size
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is None:
+            new_node = self._lru_list.insert_front(key)
+            self._lru_nodes.put(key, new_node)
+        else:
+            self._lru_list.move_to_front(lru_node)
+
+        try:
+            self._evict_if_needed()
+        except OOMError:
+            if self._data.contains(key):
+                self._delete_key_internal(key)
+            raise
+
+    def get(self, key: str) -> str | None:
+        """키의 값을 조회하고, 존재하면 해당 키를 최근 사용 상태로 만든다.
+
+        조회 전에 만료 여부를 검사하는 이유는
+        이미 TTL이 지난 키를 살아 있는 데이터처럼 반환하지 않기 위해서이다.
+        값이 존재하면 LRU 노드를 리스트 앞쪽으로 이동시켜
+        메모리 압박 시 최근 접근한 키가 덜 축출되도록 한다.
+        """
+        if self._is_expired(key):
+            return None
+
+        value = self._data.get(key)
+        if value is None:
+            return None
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.move_to_front(lru_node)
+
+        return value
+
+    def delete(self, key: str) -> int:
+        """키를 삭제하고 실제로 제거되었는지 1 또는 0으로 반환한다.
+
+        이미 만료된 키는 조회 가능한 데이터가 아니므로
+        명시 삭제 대상이 아니라 없는 키와 같은 결과를 돌려준다.
+        내부 삭제 루틴 하나로 메모리, TTL, LRU를 함께 정리해야
+        구조 간 불일치가 누적되지 않는다.
+        """
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        self._delete_key_internal(key)
+        return 1
+
+    def exists(self, key: str) -> int:
+        """키가 현재 유효하게 존재하면 1, 아니면 0을 반환한다.
+
+        TTL이 지난 키를 선제적으로 제거해야
+        존재 확인이 오래된 힙 정리 여부에 따라 달라지는 문제를 피할 수 있다.
+        반환형을 정수로 고정하는 이유는 Redis 스타일 명령 결과와 맞추기 위해서이다.
+        """
+        if self._is_expired(key):
+            return 0
+        if self._data.contains(key):
+            return 1
+        return 0
+
+    def dbsize(self) -> int:
+        """만료 정리 후 현재 저장된 유효 키 개수를 반환한다.
+
+        정리 없이 크기만 읽으면 힙에는 만료 정보가 있으나 데이터에도 아직 남아 있는
+        지연 삭제 항목이 카운트될 수 있으므로 먼저 purge를 수행한다.
+        """
+        self._purge_expired()
+        return self._data.size()
+
+    def keys(self) -> list[str]:
+        """만료 정리 후 현재 유효한 모든 키 목록을 반환한다.
+
+        지연 삭제 구조에서는 만료된 키가 내부 해시맵에 잠시 남아 있을 수 있으므로
+        외부에 키 목록을 노출하기 전에 purge를 실행해 관찰 가능한 상태를 맞춘다.
+        """
+        self._purge_expired()
+        return self._data.keys()
+
+    def set_maxmemory(self, bytes_limit: int) -> None:
+        """최대 메모리 한도를 설정하고 즉시 초과분을 해소한다.
+
+        제한을 낮춘 직후에도 초과 상태를 그대로 두면
+        이후 명령에서야 뒤늦게 실패하거나 축출되어 일관성이 떨어지므로 즉시 정리한다.
+        먼저 만료 키를 제거하는 이유는
+        실제로는 버려도 될 데이터를 축출 카운트에 포함하지 않기 위해서이다.
+        """
+        self._maxmemory = bytes_limit
+        self._purge_expired()
+        self._evict_if_needed()
+
+    def info_memory(self) -> tuple[int, int, int]:
+        """현재 사용 메모리, 최대 메모리, 누적 축출 키 수를 반환한다.
+
+        정보 조회도 외부에 보이는 관리 지표이므로
+        만료 데이터를 포함한 낡은 수치를 보여주지 않기 위해 먼저 purge를 수행한다.
+        """
+        self._purge_expired()
+        return (self._used_memory, self._maxmemory, self._evicted_keys)
+
+    def expire(self, key: str, seconds: int) -> int:
+        """키에 TTL을 설정하고 성공 여부를 1 또는 0으로 반환한다.
+
+        존재하지 않거나 이미 만료된 키에는 TTL을 붙일 수 없으므로 0을 반환한다.
+        TTL이 0 이하이면 미래 시각을 기록할 이유가 없으므로 즉시 삭제해
+        호출 시점 이후에 키가 남지 않도록 보장한다.
+        양수 TTL은 만료 시각을 TTL 맵과 최소 힙에 함께 기록한다.
+        힙에는 같은 키의 오래된 만료 항목이 남을 수 있지만,
+        purge 시 현재 TTL 맵 값과 비교해 최신 항목만 실제 삭제에 사용한다.
+        """
+        if self._is_expired(key):
+            return 0
+
+        if not self._data.contains(key):
+            return 0
+
+        if seconds <= 0:
+            self._delete_key_internal(key)
+            return 1
+
+        expire_at = float(self._now_fn()) + float(seconds)
+        self._ttl_map.put(key, expire_at)
+        self._ttl_heap.push((expire_at, key))
+        return 1
+
+    def ttl(self, key: str) -> int:
+        """키의 남은 TTL을 Redis 호환 규칙에 맞춰 반환한다.
+
+        키가 없거나 조회 시점에 이미 만료되었으면 -2를 반환한다.
+        키는 있지만 만료 설정이 없으면 -1을 반환한다.
+        양수 TTL이 있으면 초 단위 올림을 사용해 계산하는데,
+        이는 아직 남아 있는 부분 초를 0으로 잘라 조기 만료처럼 보이지 않게 하기 위해서이다.
+        """
+        if self._is_expired(key):
+            return -2
+
+        if not self._data.contains(key):
+            return -2
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return -1
+
+        remaining = max(0, int(math.ceil(expire_at - float(self._now_fn()))))
+        return remaining
+
+    def _is_expired(self, key: str) -> bool:
+        """주어진 키가 현재 시각 기준으로 만료되었는지 판정한다.
+
+        먼저 전체 purge를 실행하는 이유는
+        힙 루트에 도달한 다른 만료 키들을 함께 정리해 전역 상태를 최신으로 맞추기 위해서이다.
+        그 뒤 특정 키의 TTL을 직접 다시 확인하는 이유는
+        힙에는 최신화 과정에서 생긴 오래된 항목이 남아 있을 수 있기 때문이다.
+        만료가 확인되면 즉시 내부 삭제를 수행해 같은 키가 이후 연산마다 반복 검사되지 않게 한다.
+        """
+        self._purge_expired()
+
+        expire_at = self._ttl_map.get(key)
+        if expire_at is None:
+            return False
+
+        now = float(self._now_fn())
+        if expire_at <= now:
+            self._delete_key_internal(key)
+            return True
+
+        return False
+
+    def _evict_if_needed(self) -> None:
+        """사용 메모리가 한도를 넘는 동안 LRU 기준으로 키를 축출한다.
+
+        축출 전에 만료 키를 먼저 제거해야
+        실제로는 이미 무효한 데이터를 최근 사용 여부와 무관하게 공짜로 정리할 수 있다.
+        maxmemory가 0 이하이면 제한이 없다는 뜻으로 보고 아무 작업도 하지 않는다.
+        초과 상태에서는 LRU 리스트의 뒤쪽, 즉 가장 오래 사용되지 않은 키부터 제거한다.
+        리스트에는 있으나 데이터 맵에는 없는 비정상 상태를 남기지 않도록
+        LRU 노드 참조와 본문 데이터를 함께 정리한다.
+        리스트가 비어 더 이상 지울 항목이 없는데도 초과가 해소되지 않으면
+        호출자가 실패를 감지할 수 있도록 OOMError를 발생시킨다.
+        """
+        self._purge_expired()
+
+        if self._maxmemory <= 0:
+            return
+
+        while self._used_memory > self._maxmemory:
+            lru_key = self._lru_list.remove_back()
+            if lru_key is None:
+                raise OOMError()
+
+            self._lru_nodes.remove(lru_key)
+            if self._data.contains(lru_key):
+                value = self._data.get(lru_key)
+                if value is not None:
+                    self._used_memory -= self._entry_size(lru_key, value)
+                self._data.remove(lru_key)
+                if self._ttl_map.contains(lru_key):
+                    self._ttl_map.remove(lru_key)
+                self._evicted_keys += 1
+
+    def _entry_size(self, key: str, value: str) -> int:
+        """키와 값을 UTF-8 바이트 길이 합으로 환산해 엔트리 크기를 계산한다.
+
+        문자열 길이가 아니라 인코딩된 바이트 수를 써야
+        한글 같은 멀티바이트 문자가 실제 메모리 제한 판단에서 과소 계산되지 않는다.
+        """
+        return len(key.encode("utf-8")) + len(value.encode("utf-8"))
+
+    def _delete_key_internal(self, key: str) -> None:
+        """키와 관련된 본문, TTL, LRU 정보를 한 번에 제거한다.
+
+        삭제 경로가 여러 곳에 흩어지면 메모리 차감, TTL 제거, 리스트 정리가 서로 어긋나기 쉬우므로
+        공통 루틴으로 묶어 모든 제거 연산이 같은 후처리를 거치게 한다.
+        값이 실제로 존재할 때만 메모리 사용량을 차감하는 이유는
+        중복 삭제 호출에서도 통계가 음수로 흐트러지지 않게 하기 위해서이다.
+        """
+        value = self._data.get(key)
+        if value is not None:
+            self._used_memory -= self._entry_size(key, value)
+            self._data.remove(key)
+
+        if self._ttl_map.contains(key):
+            self._ttl_map.remove(key)
+
+        lru_node = self._lru_nodes.get(key)
+        if lru_node is not None:
+            self._lru_list.remove_node(lru_node)
+            self._lru_nodes.remove(key)
+
+    def _purge_expired(self) -> None:
+        """최소 힙을 이용해 현재 시각까지 만료된 키를 모두 정리한다.
+
+        힙의 루트만 확인하면 가장 이른 만료 시각을 알 수 있으므로
+        아직 루트가 미래라면 그 뒤 항목도 전부 미래라는 성질을 이용해 즉시 종료할 수 있다.
+        같은 키에 대해 EXPIRE가 여러 번 호출되면 힙에는 예전 만료 항목이 남을 수 있으므로
+        팝한 값이 TTL 맵의 현재 만료 시각과 다르면 오래된 기록으로 보고 건너뛴다.
+        최신 항목과 일치할 때만 실제 삭제를 수행해야
+        TTL 연장이 과거 힙 항목 때문에 무효화되지 않는다.
+        """
+        now = float(self._now_fn())
+
+        while self._ttl_heap.size() > 0:
+            item = self._ttl_heap.peek()
+            if item is None:
+                return
+
+            expire_at, key = item
+            if expire_at > now:
+                return
+
+            self._ttl_heap.pop()
+            current_expire_at = self._ttl_map.get(key)
+            if current_expire_at is None:
+                continue
+            if current_expire_at != expire_at:
+                continue
+            self._delete_key_internal(key)
+[19:02:44]   작성 mini_redis/store.py (322줄)
+
+----- write mini_redis/commands.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/commands.py
+from .errors import NotIntegerError, RedisError, UnknownCommandError, WrongArgsError
+
+
+def execute(store: 'MiniRedisStore', tokens: list[str]) -> str:
+    try:
+        if len(tokens) == 0:
+            return ""
+
+        command = tokens[0]
+        upper_command = command.upper()
+
+        if upper_command == "SET":
+            if len(tokens) != 3:
+                raise WrongArgsError(command)
+            store.set(tokens[1], tokens[2])
+            return "OK"
+
+        if upper_command == "GET":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            value = store.get(tokens[1])
+            if value is None:
+                return "(nil)"
+            return '"' + value + '"'
+
+        if upper_command == "DEL":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            result = store.delete(tokens[1])
+            return "(integer) " + str(result)
+
+        if upper_command == "EXISTS":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            result = store.exists(tokens[1])
+            return "(integer) " + str(result)
+
+        if upper_command == "DBSIZE":
+            if len(tokens) != 1:
+                raise WrongArgsError(command)
+            result = store.dbsize()
+            return "(integer) " + str(result)
+
+        if upper_command == "KEYS":
+            if len(tokens) != 1:
+                raise WrongArgsError(command)
+            keys = store.keys()
+            if len(keys) == 0:
+                return "(empty array)"
+            lines: list[str] = []
+            index = 1
+            for key in keys:
+                lines.append(str(index) + '. "' + key + '"')
+                index += 1
+            return "\n".join(lines)
+
+        if upper_command == "CONFIG":
+            if len(tokens) != 4:
+                raise WrongArgsError(command)
+            if tokens[1].upper() != "SET" or tokens[2].lower() != "maxmemory":
+                raise UnknownCommandError(command)
+            bytes_limit = _parse_int(tokens[3])
+            if bytes_limit < 0:
+                raise NotIntegerError()
+            store.set_maxmemory(bytes_limit)
+            return "OK"
+
+        if upper_command == "INFO":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            if tokens[1].lower() != "memory":
+                raise UnknownCommandError(command)
+            used_memory, maxmemory, evicted_keys = store.info_memory()
+            return (
+                "used_memory:" + str(used_memory) + "\n"
+                + "maxmemory:" + str(maxmemory) + "\n"
+                + "evicted_keys:" + str(evicted_keys)
+            )
+
+        if upper_command == "EXPIRE":
+            if len(tokens) != 3:
+                raise WrongArgsError(command)
+            seconds = _parse_int(tokens[2])
+            result = store.expire(tokens[1], seconds)
+            return "(integer) " + str(result)
+
+        if upper_command == "TTL":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            result = store.ttl(tokens[1])
+            return "(integer) " + str(result)
+
+        raise UnknownCommandError(command)
+    except RedisError as error:
+        return str(error)
+
+
+def _parse_int(value: str) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        raise NotIntegerError()
+
+
+[이 실행에서 방금 만든 파일 — 여기 적힌 이름과 호출 방식을 그대로 쓴다]
+### 방금 만든 파일 mini_redis/linked_list.py
+class Node:
+    """이중 연결 리스트의 노드이다."""
+
+    def __init__(self, data: object) -> None:
+        """데이터를 담는 노드를 초기화한다. 노드 생성은 포인터 대입만 수행하므로 O(1)이다."""
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """O(1) 포인터 재연결로 앞뒤 삽입, 삭제, 이동을 지원하는 이중 연결 리스트이다."""
+
+    def __init__(self) -> None:
+        """빈 리스트를 초기화한다. head와 tail 설정만 수행하므로 O(1)이다."""
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        """리스트 맨 앞에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        """리스트 맨 뒤에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        """리스트 맨 앞 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        """리스트 맨 뒤 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        """주어진 노드를 리스트에서 제거한다. 탐색 없이 이웃 포인터만 재연결하므로 O(1)이다."""
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.pr
+[19:02:53] write      gpt-5.4        mini_redis/commands.py   입력   3598 출력   904 차감   4502 누적   29026 (8초)
+
+----- write mini_redis/commands.py / 응답 / gpt-5.4 -----
+from .errors import NotIntegerError, RedisError, UnknownCommandError, WrongArgsError
+
+
+def execute(store: 'MiniRedisStore', tokens: list[str]) -> str:
+    """토큰화된 CLI 명령을 해석해 저장소 메서드로 라우팅하고 Redis 형식의 문자열 응답을 반환한다.
+
+    명령 파싱, 인자 수 검증, 출력 포맷, 예외 문자열화가 모두 이 함수에 모여 있는 이유는
+    저장소 구현이 데이터 처리에만 집중하고 CLI 계층은 사용자와의 계약을 일관되게 유지하도록 분리하기 위해서이다.
+    """
+    try:
+        if len(tokens) == 0:
+            return ""
+
+        command = tokens[0]
+        upper_command = command.upper()
+
+        if upper_command == "SET":
+            if len(tokens) != 3:
+                raise WrongArgsError(command)
+            store.set(tokens[1], tokens[2])
+            return "OK"
+
+        if upper_command == "GET":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            value = store.get(tokens[1])
+            if value is None:
+                return "(nil)"
+            return '"' + value + '"'
+
+        if upper_command == "DEL":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            result = store.delete(tokens[1])
+            return "(integer) " + str(result)
+
+        if upper_command == "EXISTS":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            result = store.exists(tokens[1])
+            return "(integer) " + str(result)
+
+        if upper_command == "DBSIZE":
+            if len(tokens) != 1:
+                raise WrongArgsError(command)
+            result = store.dbsize()
+            return "(integer) " + str(result)
+
+        if upper_command == "KEYS":
+            if len(tokens) != 1:
+                raise WrongArgsError(command)
+            keys = store.keys()
+            if len(keys) == 0:
+                return "(empty array)"
+            lines: list[str] = []
+            index = 1
+            for key in keys:
+                lines.append(str(index) + '. "' + key + '"')
+                index += 1
+            return "\n".join(lines)
+
+        if upper_command == "CONFIG":
+            if len(tokens) != 4:
+                raise WrongArgsError(command)
+            if tokens[1].upper() != "SET" or tokens[2].lower() != "maxmemory":
+                raise UnknownCommandError(command)
+            bytes_limit = _parse_int(tokens[3])
+            if bytes_limit < 0:
+                raise NotIntegerError()
+            store.set_maxmemory(bytes_limit)
+            return "OK"
+
+        if upper_command == "INFO":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            if tokens[1].lower() != "memory":
+                raise UnknownCommandError(command)
+            used_memory, maxmemory, evicted_keys = store.info_memory()
+            return (
+                "used_memory:" + str(used_memory) + "\n"
+                + "maxmemory:" + str(maxmemory) + "\n"
+                + "evicted_keys:" + str(evicted_keys)
+            )
+
+        if upper_command == "EXPIRE":
+            if len(tokens) != 3:
+                raise WrongArgsError(command)
+            seconds = _parse_int(tokens[2])
+            result = store.expire(tokens[1], seconds)
+            return "(integer) " + str(result)
+
+        if upper_command == "TTL":
+            if len(tokens) != 2:
+                raise WrongArgsError(command)
+            result = store.ttl(tokens[1])
+            return "(integer) " + str(result)
+
+        raise UnknownCommandError(command)
+    except RedisError as error:
+        return str(error)
+
+
+def _parse_int(value: str) -> int:
+    """문자열을 정수로 변환하고 실패 시 Redis 호환 예외를 발생시킨다.
+
+    파이썬의 기본 예외를 그대로 노출하지 않는 이유는
+    명령 계층이 사용자에게 일관된 에러 의미와 메시지를 제공해야 하기 때문이다.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        raise NotIntegerError()
+[19:02:53]   작성 mini_redis/commands.py (112줄)
+
+----- write mini_redis/parser.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/parser.py
+def tokenize(line: str) -> list[str]:
+    tokens: list[str] = []
+    current_chars: list[str] = []
+    in_quotes = False
+    i = 0
+    length = len(line)
+
+    while i < length:
+        ch = line[i]
+
+        if in_quotes:
+            if ch == '"':
+                tokens.append("".join(current_chars))
+                current_chars = []
+                in_quotes = False
+            else:
+                current_chars.append(ch)
+            i += 1
+            continue
+
+        if ch.isspace():
+            if current_chars:
+                tokens.append("".join(current_chars))
+                current_chars = []
+            i += 1
+            continue
+
+        if ch == '"':
+            if current_chars:
+                tokens.append("".join(current_chars))
+                current_chars = []
+            in_quotes = True
+            i += 1
+            continue
+
+        current_chars.append(ch)
+        i += 1
+
+    if current_chars:
+        tokens.append("".join(current_chars))
+    elif in_quotes:
+        tokens.append("".join(current_chars))
+
+    return tokens
+
+
+[이 실행에서 방금 만든 파일 — 여기 적힌 이름과 호출 방식을 그대로 쓴다]
+### 방금 만든 파일 mini_redis/linked_list.py
+class Node:
+    """이중 연결 리스트의 노드이다."""
+
+    def __init__(self, data: object) -> None:
+        """데이터를 담는 노드를 초기화한다. 노드 생성은 포인터 대입만 수행하므로 O(1)이다."""
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """O(1) 포인터 재연결로 앞뒤 삽입, 삭제, 이동을 지원하는 이중 연결 리스트이다."""
+
+    def __init__(self) -> None:
+        """빈 리스트를 초기화한다. head와 tail 설정만 수행하므로 O(1)이다."""
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        """리스트 맨 앞에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        """리스트 맨 뒤에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        """리스트 맨 앞 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        """리스트 맨 뒤 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        """주어진 노드를 리스트에서 제거한다. 탐색 없이 이웃 포인터만 재연결하므로 O(1)이다."""
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = None
+
+    def move_to_front(self, node: Node) -> None:
+        """주어진 노드를 리스트 맨 앞으로 이동한다. 탐색 없이 포인터만 재배치하므로 O(1)이다."""
+        i
+
+### 방금 만든 파일 mini_redis/hashmap.py
+from .linked_list import DoublyLinkedList, Node
+
+
+class HashMap:
+    """이중 연결 리스트 체이닝으로 충돌을 해결하는 문자열 키 기반 해시맵이다."""
+
+    def __init__(self, initial_capacity: int = 8) -> None:
+        """초기 버킷 배열을 준비한다.
+
+        용량이 1 미만이면 너무 작은 테이블로 인한 즉시 리사이즈를 피하기 위해 기본값 8을 사용한다.
+        각 버킷을 독립적인 연결 리스트로 만들어 충돌 시에도 삽입과 삭제 규칙을 단순하게 유지한다.
+        """
+        capacity = initial_capacity
+        if capacity < 1:
+            capacity = 8
+        self._capacity: int = capacity
+        self._size: int = 0
+        self._buckets: list[DoublyLinkedList] = [DoublyLinkedList() for _ in range(self._capacity)]
+
+    def _hash(self, key: str) -> int:
+        """문자열 키를 현재 버킷 범위 안의 인덱스로 변환한다.
+
+        djb2는 구현이 단순하면서 문자열에 대해 비교적 고른 분산을 제공하므로
+        교육용 해시맵에서 해시 원리를 드러내기에 적합하다.
+        """
+        hash_value = 5381
+        for char in key:
+            hash_value = ((hash_value << 5) + hash_value) + ord(char)
+        return hash_value % self._capacity
+
+    def put(self, key: str, value: object) -> None:
+        """키에 값을 저장하거나 기존 키의 값을 갱신한다.
+
+        같은 키가 이미 있으면 항목 수를 늘리지 않고 값만 바꿔야
+        size와 로드 팩터가 실제 엔트리 개수를 정확히 반영한다.
+        새 키를 추가한 뒤 로드 팩터가 임계값을 넘으면 조회 성능 악화를 늦추기 위해 리사이즈한다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                current.data = (key, value)
+                return
+            current = current.next
+
+        bucket.insert_back((key, value))
+        self._size += 1
+
+        if self._size / self._capacity > 0.75:
+            self._resize()
+
+    def get(self, key: str) -> object | None:
+        """키에 대응하는 값을 반환하고, 없으면 None을 반환한다.
+
+        해시가 가리키는 버킷만 순회하도록 제한하는 이유는
+        전체 데이터를 매번 탐색하는 선형 비용을 피하기 위해서이다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                return entry[1]
+        
+[19:02:57] write      gpt-5.4        mini_redis/parser.py     입력   3076 출력   352 차감   3428 누적   32454 (5초)
+
+----- write mini_redis/parser.py / 응답 / gpt-5.4 -----
+def tokenize(line: str) -> list[str]:
+    """명령줄 한 줄을 공백과 큰따옴표 규칙에 따라 토큰 목록으로 분해한다.
+
+    따옴표 밖에서는 연속된 공백을 구분자로 사용하고,
+    따옴표 안에서는 공백도 데이터로 유지한다.
+    큰따옴표를 만나면 quoted token을 시작하거나 끝내며,
+    닫히지 않은 따옴표가 있어도 지금까지 모은 내용을 토큰으로 남겨
+    입력 손실 없이 상위 계층이 후속 판단을 할 수 있게 한다.
+    """
+    tokens: list[str] = []
+    current_chars: list[str] = []
+    in_quotes = False
+    i = 0
+    length = len(line)
+
+    while i < length:
+        ch = line[i]
+
+        if in_quotes:
+            if ch == '"':
+                tokens.append("".join(current_chars))
+                current_chars = []
+                in_quotes = False
+            else:
+                current_chars.append(ch)
+            i += 1
+            continue
+
+        if ch.isspace():
+            if current_chars:
+                tokens.append("".join(current_chars))
+                current_chars = []
+            i += 1
+            continue
+
+        if ch == '"':
+            if current_chars:
+                tokens.append("".join(current_chars))
+                current_chars = []
+            in_quotes = True
+            i += 1
+            continue
+
+        current_chars.append(ch)
+        i += 1
+
+    if current_chars:
+        tokens.append("".join(current_chars))
+    elif in_quotes:
+        tokens.append("".join(current_chars))
+
+    return tokens
+[19:02:57]   작성 mini_redis/parser.py (52줄)
+
+----- write mini_redis/cli.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 mini_redis/cli.py
+from .commands import execute
+from .parser import tokenize
+from .store import MiniRedisStore
+
+
+def run() -> None:
+    store = MiniRedisStore()
+
+    while True:
+        try:
+            line = input("mini-redis> ")
+        except EOFError:
+            print()
+            break
+
+        stripped = line.strip()
+        if stripped.lower() == "exit" or stripped.lower() == "quit":
+            break
+
+        tokens = tokenize(line)
+        result = execute(store, tokens)
+        if result != "":
+            print(result)
+
+
+[이 실행에서 방금 만든 파일 — 여기 적힌 이름과 호출 방식을 그대로 쓴다]
+### 방금 만든 파일 mini_redis/linked_list.py
+class Node:
+    """이중 연결 리스트의 노드이다."""
+
+    def __init__(self, data: object) -> None:
+        """데이터를 담는 노드를 초기화한다. 노드 생성은 포인터 대입만 수행하므로 O(1)이다."""
+        self.data: object = data
+        self.prev: 'Node | None' = None
+        self.next: 'Node | None' = None
+
+
+class DoublyLinkedList:
+    """O(1) 포인터 재연결로 앞뒤 삽입, 삭제, 이동을 지원하는 이중 연결 리스트이다."""
+
+    def __init__(self) -> None:
+        """빈 리스트를 초기화한다. head와 tail 설정만 수행하므로 O(1)이다."""
+        self.head: Node | None = None
+        self.tail: Node | None = None
+
+    def insert_front(self, data: object) -> Node:
+        """리스트 맨 앞에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.next = self.head
+        if self.head is not None:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        return node
+
+    def insert_back(self, data: object) -> Node:
+        """리스트 맨 뒤에 새 노드를 삽입한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        node = Node(data)
+        node.prev = self.tail
+        if self.tail is not None:
+            self.tail.next = node
+        else:
+            self.head = node
+        self.tail = node
+        return node
+
+    def remove_front(self) -> object | None:
+        """리스트 맨 앞 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.head is None:
+            return None
+
+        node = self.head
+        self.head = node.next
+
+        if self.head is not None:
+            self.head.prev = None
+        else:
+            self.tail = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_back(self) -> object | None:
+        """리스트 맨 뒤 노드를 제거하고 그 데이터를 반환한다. 포인터 몇 개만 갱신하므로 O(1)이다."""
+        if self.tail is None:
+            return None
+
+        node = self.tail
+        self.tail = node.prev
+
+        if self.tail is not None:
+            self.tail.next = None
+        else:
+            self.head = None
+
+        node.prev = None
+        node.next = None
+        return node.data
+
+    def remove_node(self, node: Node) -> None:
+        """주어진 노드를 리스트에서 제거한다. 탐색 없이 이웃 포인터만 재연결하므로 O(1)이다."""
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = None
+
+    def move_to_front(self, node: Node) -> None:
+        """주어진 노드를 리스트 맨 앞으로 이동한다. 탐색 없이 포인터만 재배치하므로 O(1)이다."""
+        i
+
+### 방금 만든 파일 mini_redis/hashmap.py
+from .linked_list import DoublyLinkedList, Node
+
+
+class HashMap:
+    """이중 연결 리스트 체이닝으로 충돌을 해결하는 문자열 키 기반 해시맵이다."""
+
+    def __init__(self, initial_capacity: int = 8) -> None:
+        """초기 버킷 배열을 준비한다.
+
+        용량이 1 미만이면 너무 작은 테이블로 인한 즉시 리사이즈를 피하기 위해 기본값 8을 사용한다.
+        각 버킷을 독립적인 연결 리스트로 만들어 충돌 시에도 삽입과 삭제 규칙을 단순하게 유지한다.
+        """
+        capacity = initial_capacity
+        if capacity < 1:
+            capacity = 8
+        self._capacity: int = capacity
+        self._size: int = 0
+        self._buckets: list[DoublyLinkedList] = [DoublyLinkedList() for _ in range(self._capacity)]
+
+    def _hash(self, key: str) -> int:
+        """문자열 키를 현재 버킷 범위 안의 인덱스로 변환한다.
+
+        djb2는 구현이 단순하면서 문자열에 대해 비교적 고른 분산을 제공하므로
+        교육용 해시맵에서 해시 원리를 드러내기에 적합하다.
+        """
+        hash_value = 5381
+        for char in key:
+            hash_value = ((hash_value << 5) + hash_value) + ord(char)
+        return hash_value % self._capacity
+
+    def put(self, key: str, value: object) -> None:
+        """키에 값을 저장하거나 기존 키의 값을 갱신한다.
+
+        같은 키가 이미 있으면 항목 수를 늘리지 않고 값만 바꿔야
+        size와 로드 팩터가 실제 엔트리 개수를 정확히 반영한다.
+        새 키를 추가한 뒤 로드 팩터가 임계값을 넘으면 조회 성능 악화를 늦추기 위해 리사이즈한다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                current.data = (key, value)
+                return
+            current = current.next
+
+        bucket.insert_back((key, value))
+        self._size += 1
+
+        if self._size / self._capacity > 0.75:
+            self._resize()
+
+    def get(self, key: str) -> object | None:
+        """키에 대응하는 값을 반환하고, 없으면 None을 반환한다.
+
+        해시가 가리키는 버킷만 순회하도록 제한하는 이유는
+        전체 데이터를 매번 탐색하는 선형 비용을 피하기 위해서이다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+                return entry[1]
+            current = current.next
+
+        return None
+
+    def remove(self, key: str) -> bool:
+        """키에 해당하는 항목을 제거하고 성공 여부를 반환한다.
+
+        체이닝 구조에서는 같은 버킷 안에서만 키를 찾으면 되며,
+        노드를 직접 제거할 수 있어 찾은 뒤의 삭제 비용을 O(1)로 유지할 수 있다.
+        """
+        index = self._hash(key)
+        bucket = self._buckets[index]
+
+        current: Node | None = bucket.head
+        while current is not None:
+            entry = current.data
+            if entry[0] == key:
+  
+
+### 방금 만든 파일 mini_redis/heap.py
+class MinHeap:
+    """TTL 만료 시각이 가장 이른 항목을 빠르게 찾기 위한 배열 기반 최소 힙이
+[19:03:00] write      gpt-5.4        mini_redis/cli.py        입력   2968 출력   187 차감   3155 누적   35609 (3초)
+
+----- write mini_redis/cli.py / 응답 / gpt-5.4 -----
+from .commands import execute
+from .parser import tokenize
+from .store import MiniRedisStore
+
+
+def run() -> None:
+    """Mini Redis 명령을 반복해서 읽고 실행하는 REPL을 시작한다.
+
+    사용자가 한 줄을 입력할 때마다 토큰화 후 실행 결과를 출력한다.
+    exit 또는 quit을 입력하면 루프를 종료하고,
+    입력 스트림이 끝나면 줄바꿈을 한 번 출력한 뒤 종료한다.
+    """
+    store = MiniRedisStore()
+
+    while True:
+        try:
+            line = input("mini-redis> ")
+        except EOFError:
+            print()
+            break
+
+        stripped = line.strip()
+        if stripped.lower() == "exit" or stripped.lower() == "quit":
+            break
+
+        tokens = tokenize(line)
+        result = execute(store, tokens)
+        if result != "":
+            print(result)
+[19:03:00]   작성 mini_redis/cli.py (29줄)
+
+----- write tests/test_mini_redis.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 b5-1.md (앞 5000자)
+# b5-1. 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- **과정**: 자료구조와 알고리즘 (Data Structures & Algorithms)
+- **과제 번호**: `b5-1` (uqstnNo: 185008)
+
+---
+
+*(이미지)*
+
+### 1\. 미션 소개
+
+Redis를 써봤는데 왜 이렇게 빠른지 설명해보라고 하면 막히는 분들이 많습니다. 이유가 있습니다. 내부의 자료구조를 직접 구현해본 사람이 드물기 때문입니다. 해시맵, 이중 연결 리스트, 힙을 밑바닥부터 짜면서 LRU와 TTL이 어떻게 동작하는지 손으로 확인합니다.
+
+Redis는 전 세계에서 가장 널리 사용되는 In-Memory Key-Value 데이터 저장소입니다. 캐시, 메시지 브로커, 세션 저장소 등 다양한 용도로 활용되며, 그 핵심에는 효율적인 자료구조가 있습니다.
+
+이번 미션에서는 Redis의 핵심 기능을 직접 구현하며 CLI 기반 Mini Redis를 완성합니다. 해시맵, 이중 연결 리스트, 힙 같은 자료구조를 밑바닥부터 구현하면서 평소 당연하게 사용하던 내장 자료형의 내부 동작 원리를 깊이 이해하게 됩니다.
+
+또한, 실제 Redis가 메모리 제한 환경에서 어떻게 LRU 방식으로 오래된 데이터를 자동 제거하고, TTL을 통해 만료 시간을 관리하는지 직접 구현하며 체득합니다. 이 경험은 이후 알고리즘 학습, 코딩 테스트, 실제 서비스 성능 최적화로 확장될 수 있습니다.
+
+---
+
+### 2\. 최종 결과물
+
+다음 기능이 정상 동작하는 CLI 기반 Mini Redis 프로그램 1개를 완성한다.
+
+1.  String 타입 기본 명령어 (6개)
+    *   `SET`: 키에 값 저장 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `GET`: 키의 값 조회 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `DEL`: 키 삭제
+    *   `EXISTS`: 키 존재 여부 확인
+    *   `DBSIZE`: 전체 키 개수 반환
+    *   `KEYS`: 전체 키 목록 출력 (패턴 매칭은 구현하지 않음)
+2.  메모리 관리 명령어 (2개)
+    *   `CONFIG SET maxmemory`: 최대 메모리 제한 설정 (바이트 단위)
+    *   `INFO memory`: 현재 메모리 사용량, 제한, 제거된 키 개수 확인
+3.  TTL 관리 명령어 (2개)
+    *   `EXPIRE`: 키의 만료 시간 설정 (초 단위)
+    *   `TTL`: 키의 남은 만료 시간 조회
+4.  CLI 인터페이스
+    *   사용자가 명령어를 입력하면 즉시 실행 결과를 확인할 수 있는 REPL 환경
+    *   명령어 파싱, 실행, 결과 출력이 반복적으로 동작
+
+---
+
+### 3\. 과제 목표
+
+이 과제를 마친 후, 학습자는 아래를 스스로 설명할 수 있어야 한다.
+
+*   해시맵의 해시 함수와 충돌 해결 방식(체이닝)을 구현 코드를 기반으로 설명할 수 있다.
+*   이중 연결 리스트와 해시맵을 조합하여 O(1) LRU 추적이 가능한 이유를 설명할 수 있다.
+*   힙이 TTL 만료 시간 관리에 적합한 이유를 설명할 수 있다.
+*   메모리 제한 환경에서 LRU 정책으로 데이터를 제거하는 전체 흐름(used\_memory 갱신 포함)을 설명할 수 있다.
+
+---
+
+### 4\. 기능 요구 사항
+
+다음 요구사항을 모두 만족해야 한다.
+
+1.  기본 자료구조 직접 구현 (내장 Key-Value 컬렉션으로 대체 금지)
+    *   이중 연결 리스트
+        *   노드 구조: `prev`, `next`, `data` 필드
+        *   주요 메서드: `insert_front`, `insert_back`, `remove_front`, `remove_back`, `remove_node`, `move_to_front`
+        *   모든 삽입/삭제/이동 연산은 O(1)이어야 한다
+    *   해시맵 (체이닝 방식)
+        *   주요 메서드: `put`, `get`, `remove`, `contains`, `keys`, `size`
+        *   해시 함수는 직접 설계해야 한다
+        *   충돌 해결은 체이닝 방식으로 구현해야 한다 (권장: 이중 연결 리스트 재사용)
+        *   로드 팩터 0.75 초과 시 버킷을 2배 확장해야 한다
+    *   힙 (최소 힙)
+        *   주요 메서드: `push`, `pop`, `peek`, `size`
+        *   `_heapify_up`, `_heapify_down` 구현 필요
+        *   TTL 만료 관리를 위해 `(expire_at, key)` 형태의 요소를 다룰 수 있어야 한다
+2.  String 타입 명령어 (Redis 스타일 출력)
+    *   공통 규칙
+        *   키 기반 명령어는 실행 전 “만료 여부”를 먼저 확인할 수 있어야 한다 (만료된 키는 삭제 후 ‘없는 키’처럼 처리).
+        *   출력은 Redis 스타일을 따른다: `OK`, `(nil)`, `(integer) N`, `(error) ...`
+    *   `SET key value`
+        *   성공 시 `OK`
+        *   메모리 초과 시 LRU 제거를 수행한다(세부 규칙은 3번 참조)
+        *   기존 키를 덮어쓰는 경우: 기존 TTL은 “초기화(삭제)”한다
+    *   `GET key`
+        *   키가 없거나 만료된 경우 `(nil)`
+        *   존재하는 경우 `"value"` 형태로 반환
+        *   반환이 성공한 경우에만 LRU를 갱신한다 (만료로 삭제된 경우는 갱신하지 않음)
+    *   `DEL key`
+        *   삭제 성공 시 `(integer) 1`, 없으면 `(integer) 0`
+        *   삭제 시 LRU/TTL 관련 구조에서도 해당 엔트리를 함께 제거해야 한다
+    *   `EXISTS key`
+        *   존재하면 `(integer) 1`, 없으면 `(integer) 0`
+    *   `DBSIZE`
+        *   현재 저장된 키 개수를 `(integer) N`으로 반환
+    *   `KEYS`
+        *   전체 키 목록을 배열 형태로 출력 (정렬/순서는 요구하지 않음)
+        *   예시:
+            1.  "user:2"
+            2.  "user:3"
+        *   키가 없으면 `(empty array)` 같은 형태로 비어 있음을 표현해도 된다
+3.  메모리 관리 + LRU 자동 제거
+    *   `CONFIG SET maxmemory bytes`
+        *   `bytes`는 0 이상의 정수
+        *   0은 “무제한”으로 간주한다
+        *   성공 시 `OK`, 정수 파싱 실패 시 에러 표준을 따른다
+    *   `INFO memory`
+        *   아래 3개 항목을 최소 포함해 출력한다(표현 형태는 동일하면 됨): used\_memory:\ maxmemory:\ evicted\_keys:\
+    *   used\_memory 산정 기준(공식)
+        *   used\_memory = Σ( len(utf8(key)) + len(utf8(value)) )
+        *   자료구조(노드/포인터/버킷 등) 오버헤드는 계산에서 제외한다
+    *   LRU 제거 규칙
+        *   `maxmemory > 0`이고, SET 이후 used\_memory가 maxmemory를 초과하면 used\_memory가 maxmemory 이하가 될 때까지 “가장 오래 사용되지 않은 키(LRU)”부터 제거한다
+        *   제거된 키는 `evicted_keys`에 누적 카운트한다
+        *   만약 “단일 엔트리(키+값)” 자체가 maxmemory를 초과한다면:
+            *   저장하지 않고 에러(OOM)를 출력한다
+4.  TTL 관리 (힙 기반)
+    *   `EXPIRE key seconds`
+        *   key가 없으면 `(integer) 0`
+        *   seconds가 0 이하라면 “즉시 만료”로 처리해도 된다(존재하면 삭제 후 `(integer) 1`)
+        *   정상 설정 시 `(integer) 1`
+    *   `TTL key`
+        *   key가 없으면 `(integer) -2`
+        *   key는 존재하지만 만료 시간이 없으면 `(integer) -1`
+        *   만료 시간이 있으면 남은 초를 `(integer) N`으로 반환
+    *   TTL/LRU 엣지 케이스 최소 규칙(명시)
+        *   만료된 키는 GET 시 먼저 삭제 후 `(nil)`을 반환하며, LRU 갱신은 하지 않는다
+        *   SET이 기존 키를 덮어쓸 때 TTL은 초기화(삭제)한다
+        *   EXPIRE를 없는 키에 호출하면 `(integer) 0`이다
+        *   DEL은 데이터/TTL/LRU 모든 구조에서 엔트리를 함께 제거한다
+    *   구현 방식은 “힙을 통해 가장 빠른 만료를 빠르게 찾을 수 있어야 한다”는 목표를 만족하면 된다 (예: lazy deletion 전략 등은 구현 선택)
+5.  에러 처리 표준 + CLI 인터페이스
+    *   CLI
+        *   `mini-redis>` 프롬프트 출력
+        *   사용자 입력을 읽고 명령어 파싱 및 실행
+        *   `exit` 또는 `quit`으로 종료 가능
+    *   에러 출력(표준 형식 예시)
+        *   잘못된 명령: (error) ERR unknown command '\'
+        *   인자 개수 오류: (error) ERR wrong number of arguments for '\' command
+        *   정수 파싱 실패: (error) ERR value is not an integer or out of range
+  
+
+### 참고 파일 b5-1_eval.md
+# B5-1 · 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- 구분: 자료구조와 알고리즘
+- 필수/선택: 필수
+- 진행률: 0%
+
+## 체크리스트
+
+### 항목 1
+- [ ] String 타입 기본 동작: SET, GET, DEL, EXISTS, DBSIZE, KEYS 명령어가 모두 정상 동작하는가?
+- [ ] LRU 자동 제거: maxmemory 설정 후 제한 초과 시 가장 오래된 키가 자동 제거되는가?
+- [ ] 메모리 정보 확인: INFO memory에서 used_memory/maxmemory/evicted_keys가 규칙에 맞게 출력되는가?
+- [ ] TTL 관리: EXPIRE/TTL 규칙이 동작하며 만료된 키가 적절히 제거되는가?
+- [ ] 에러 처리: 잘못된 명령/인자/정수 오류/OOM이 표준 형식으로 출력되는가?
+
+### 항목 2
+- [ ] 이중 연결 리스트의 노드 구조(prev, next, data)와 핵심 메서드들이 O(1)로 동작하도록 어떻게 구성했는지 설명할 수 있는가?
+- [ ] 해시맵에서 직접 설계한 해시 함수가 어떤 입력을 받아 어떤 과정을 거쳐 인덱스를 만드는지 설명할 수 있는가?
+- [ ] 충돌 해결을 체이닝 방식으로 어떻게 구현했는지(버킷 내부 구조 선택 포함) 설명할 수 있는가?
+- [ ] 로드 팩터 0.75 초과 시 "버킷 2배 확장"을 어떤 절차로 수행하는지 설명할 수 있는가?
+
+### 항목 3
+- [ ] LRU 구현에
+[19:03:33] write      gpt-5.4        tests/test_mini_redis.py 입력   6211 출력  3500 차감   9711 누적   45320 (32초)
+
+----- write tests/test_mini_redis.py / 응답 / gpt-5.4 -----
+import subprocess
+import sys
+import time
+import unittest
+
+from mini_redis.hashmap import HashMap
+from mini_redis.heap import MinHeap
+from mini_redis.linked_list import DoublyLinkedList
+
+
+class FakeClock:
+    """테스트가 시간 흐름을 결정적으로 제어하기 위한 가짜 시계이다."""
+
+    def __init__(self, start: float = 0.0) -> None:
+        """초기 시각을 설정한다."""
+        self.current = start
+
+    def now(self) -> float:
+        """현재 시각을 반환한다."""
+        return self.current
+
+    def advance(self, seconds: float) -> None:
+        """테스트가 원하는 만큼 시간을 전진시킨다."""
+        self.current += seconds
+
+
+class MiniRedisAdapter:
+    """구현마다 다른 진입점을 테스트에서 일관되게 다루기 위한 어댑터이다."""
+
+    def __init__(self, now_fn=None) -> None:
+        """가능한 생성 방식을 순서대로 시도해 테스트 대상을 준비한다."""
+        from mini_redis import __dict__ as package_dict
+
+        self.instance = None
+        self.execute_method_name = None
+
+        candidate_classes = []
+        for name in (
+            "MiniRedis",
+            "Redis",
+            "MiniRedisServer",
+            "MiniRedisCLI",
+            "Engine",
+            "Database",
+        ):
+            obj = package_dict.get(name)
+            if isinstance(obj, type):
+                candidate_classes.append(obj)
+
+        if not candidate_classes:
+            try:
+                from mini_redis.core import MiniRedis as CoreMiniRedis
+
+                candidate_classes.append(CoreMiniRedis)
+            except Exception:
+                pass
+
+        if not candidate_classes:
+            try:
+                from mini_redis.redis import MiniRedis as RedisMiniRedis
+
+                candidate_classes.append(RedisMiniRedis)
+            except Exception:
+                pass
+
+        if not candidate_classes:
+            try:
+                from mini_redis.cli import MiniRedis as CliMiniRedis
+
+                candidate_classes.append(CliMiniRedis)
+            except Exception:
+                pass
+
+        last_error = None
+        for cls in candidate_classes:
+            for kwargs in (
+                {"now_fn": now_fn} if now_fn is not None else {},
+                {},
+            ):
+                try:
+                    self.instance = cls(**kwargs)
+                    break
+                except TypeError as exc:
+                    last_error = exc
+                    continue
+                except Exception as exc:
+                    last_error = exc
+                    continue
+            if self.instance is not None:
+                break
+
+        if self.instance is None:
+            raise AssertionError(
+                "Mini Redis 구현 인스턴스를 생성하지 못했습니다. "
+                "mini_redis 패키지에 공개된 핵심 클래스를 확인하세요."
+            ) from last_error
+
+        for method_name in ("execute", "run_command", "handle_command", "process_command"):
+            method = getattr(self.instance, method_name, None)
+            if callable(method):
+                self.execute_method_name = method_name
+                break
+
+        if self.execute_method_name is None:
+            raise AssertionError(
+                "명령 실행 메서드를 찾지 못했습니다. "
+                "execute/run_command/handle_command/process_command 중 하나가 필요합니다."
+            )
+
+    def execute(self, command: str) -> str:
+        """문자열 명령을 실행하고 문자열 결과를 반환한다."""
+        method = getattr(self.instance, self.execute_method_name)
+        result = method(command)
+        if result is None:
+            return ""
+        return str(result)
+
+
+class ForcedCollisionHashMap(HashMap):
+    """체이닝 충돌 동작을 강제로 검증하기 위한 테스트 전용 해시맵이다."""
+
+    def _hash(self, key: str) -> int:
+        """모든 키를 같은 버킷으로 보내 충돌 처리 경로를 확실히 통과시킨다."""
+        return 0
+
+
+class DoublyLinkedListTest(unittest.TestCase):
+    """이중 연결 리스트의 핵심 연산과 경계 조건을 검증한다."""
+
+    def test_insert_front_and_back_preserve_links(self) -> None:
+        """앞뒤 삽입이 head, tail, prev, next를 올바르게 연결하는지 확인한다."""
+        linked = DoublyLinkedList()
+
+        first = linked.insert_front("b")
+        second = linked.insert_front("a")
+        third = linked.insert_back("c")
+
+        self.assertIs(linked.head, second)
+        self.assertIs(linked.tail, third)
+        self.assertIsNone(second.prev)
+        self.assertIs(second.next, first)
+        self.assertIs(first.prev, second)
+        self.assertIs(first.next, third)
+        self.assertIs(third.prev, first)
+        self.assertIsNone(third.next)
+
+    def test_remove_front_and_back_on_empty_and_non_empty(self) -> None:
+        """빈 리스트와 일반 리스트에서 앞뒤 제거 결과를 확인한다."""
+        linked = DoublyLinkedList()
+
+        self.assertIsNone(linked.remove_front())
+        self.assertIsNone(linked.remove_back())
+
+        linked.insert_back("x")
+        linked.insert_back("y")
+        linked.insert_back("z")
+
+        self.assertEqual(linked.remove_front(), "x")
+        self.assertEqual(linked.remove_back(), "z")
+        self.assertEqual(linked.remove_front(), "y")
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+        self.assertIsNone(linked.remove_back())
+
+    def test_remove_node_handles_middle_head_tail_singleton(self) -> None:
+        """임의 노드 제거가 위치와 관계없이 리스트 일관성을 유지하는지 확인한다."""
+        linked = DoublyLinkedList()
+        node_a = linked.insert_back("a")
+        node_b = linked.insert_back("b")
+        node_c = linked.insert_back("c")
+
+        linked.remove_node(node_b)
+        self.assertIs(linked.head, node_a)
+        self.assertIs(linked.tail, node_c)
+        self.assertIs(node_a.next, node_c)
+        self.assertIs(node_c.prev, node_a)
+        self.assertIsNone(node_b.prev)
+        self.assertIsNone(node_b.next)
+
+        linked.remove_node(node_a)
+        self.assertIs(linked.head, node_c)
+        self.assertIs(linked.tail, node_c)
+        self.assertIsNone(node_c.prev)
+
+        linked.remove_node(node_c)
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+
+    def test_move_to_front_moves_middle_and_tail_and_keeps_head(self) -> None:
+        """앞으로 이동 연산이 재삽입 없이 포인터만 재배치하는 결과를 검증한다."""
+        linked = DoublyLinkedList()
+        node_a = linked.insert_back("a")
+        node_b = linked.insert_back("b")
+        node_c = linked.insert_back("c")
+
+        linked.move_to_front(node_b)
+        self.assertIs(linked.head, node_b)
+        self.assertIs(linked.tail, node_c)
+        self.assertEqual(linked.head.data, "b")
+        self.assertEqual(linked.head.next.data, "a")
+        self.assertEqual(linked.tail.prev.data, "a")
+
+        linked.move_to_front(node_c)
+        self.assertIs(linked.head, node_c)
+        self.assertIs(linked.tail, node_a)
+        self.assertEqual(linked.head.next.data, "b")
+
+        linked.move_to_front(node_c)
+        self.assertIs(linked.head, node_c)
+        self.assertIsNone(linked.head.prev)
+        self.assertEqual(linked.tail.data, "a")
+
+
+class HashMapTest(unittest.TestCase):
+    """체이닝 기반 해시맵의 동작과 리사이즈를 검증한다."""
+
+    def test_hash_returns_index_within_capacity(self) -> None:
+        """해시 함수가 언제나 유효한 버킷 인덱스를 반환하는지 확인한다."""
+        hashmap = HashMap()
+        for key in ("a", "abc", "user:1", "한글", "long-key-value-1234567890"):
+            index = hashmap._hash(key)
+            self.assertGreaterEqual(index, 0)
+            self.assertLess(index, hashmap._capacity)
+
+    def test_chaining_collision_resolution(self) -> None:
+        """같은 버킷으로 몰린 키들이 서로 덮어쓰지 않고 공존하는지 확인한다."""
+        hashmap = ForcedCollisionHashMap()
+        hashmap.put("alpha", 1)
+        hashmap.put("beta", 2)
+        hashmap.put("gamma", 3)
+
+        self.assertEqual(hashmap.get("alpha"), 1)
+        self.assertEqual(hashmap.get("beta"), 2)
+        self.assertEqual(hashmap.get("gamma"), 3)
+        self.assertEqual(hashmap.size(), 3)
+
+        self.assertTrue(hashmap.contains("alpha"))
+        self.assertTrue(hashmap.contains("beta"))
+        self.assertTrue(hashmap.contains("gamma"))
+
+        self.assertTrue(hashmap.remove("beta"))
+        self.assertFalse(hashmap.contains("beta"))
+        self.assertEqual(hashmap.get("beta"), None)
+        self.assertEqual(hashmap.size(), 2)
+
+    def test_resize_doubles_capacity_from_8_to_16(self) -> None:
+        """로드 팩터가 0.75를 넘는 순간 버킷 수가 두 배가 되는지 검증한다."""
+        hashmap = HashMap(initial_capacity=8)
+        for index in range(7):
+            hashmap.put(f"key:{index}", index)
+
+        self.assertEqual(hashmap._capacity, 16)
+        for index in range(7):
+            self.assertEqual(hashmap.get(f"key:{index}"), index)
+
+    def test_put_get_remove_contains_keys_size(self) -> None:
+        """기본 해시맵 API가 요구한 의미를 만족하는지 확인한다."""
+        hashmap = HashMap()
+        hashmap.put("k1", "v1")
+        hashmap.put("k2", "v2")
+        hashmap.put("k1", "v1-new")
+
+        self.assertEqual(hashmap.get("k1"), "v1-new")
+        self.assertEqual(hashmap.get("k2"), "v2")
+        self.assertIsNone(hashmap.get("missing"))
+        self.assertTrue(hashmap.contains("k1"))
+        self.assertFalse(hashmap.contains("missing"))
+        self.assertEqual(hashmap.size(), 2)
+
+        keys = hashmap.keys()
+        self.assertIn("k1", keys)
+        self.assertIn("k2", keys)
+        self.assertEqual(len(keys), 2)
+
+        self.assertTrue(hashmap.remove("k2"))
+        self.assertFalse(hashmap.remove("k2"))
+        self.assertFalse(hashmap.contains("k2"))
+        self.assertEqual(hashmap.size(), 1)
+
+
+class MinHeapTest(unittest.TestCase):
+    """최소 힙이 TTL 우선순위를 올바르게 유지하는지 검증한다."""
+
+    def test_push_peek_pop_size_and_order(self) -> None:
+        """삽입, 조회, 제거가 최소 만료 시각 순서를 보장하는지 확인한다."""
+        heap = MinHeap()
+        self.assertEqual(heap.size(), 0)
+        self.assertIsNone(heap.peek())
+        self.assertIsNone(heap.pop())
+
+        heap.push((30.0, "k3"))
+        heap.push((10.0, "k1"))
+        heap.push((20.0, "k2"))
+        heap.push((10.0, "k1b"))
+
+        self.assertEqual(heap.size(), 4)
+        self.assertEqual(heap.peek(), (10.0, "k1"))
+
+        popped = [heap.pop(), heap.pop(), heap.pop(), heap.pop()]
+        self.assertEqual(
+            popped,
+            [(10.0, "k1"), (10.0, "k1b"), (20.0, "k2"), (30.0, "k3")],
+        )
+        self.assertEqual(heap.size(), 0)
+        self.assertIsNone(heap.pop())
+
+
+class MiniRedisCommandTest(unittest.TestCase):
+    """문자열 명령어, 메모리 정책, TTL, 에러 처리를 통합 검증한다."""
+
+    def setUp(self) -> None:
+        """각 테스트를 독립 상태에서 시작하기 위해 새 인스턴스를 만든다."""
+        self.clock = FakeClock(100.0)
+        self.redis = MiniRedisAdapter(now_fn=self.clock.now)
+
+    def test_string_commands_and_empty_keys_output(self) -> None:
+        """SET, GET, DEL, EXISTS, DBSIZE, KEYS와 빈 배열 출력을 검증한다."""
+        empty_keys = self.redis.execute("KEYS")
+        self.assertEqual(empty_keys, "(empty array)")
+
+        self.assertEqual(self.redis.execute("SET user:1 alice"), "OK")
+        self.assertEqual(self.redis.execute("SET user:2 bob"), "OK")
+        self.assertEqual(self.redis.execute("GET user:1"), '"alice"')
+        self.assertEqual(self.redis.execute("EXISTS user:1"), "(integer) 1")
+        self.assertEqual(self.redis.execute("EXISTS missing"), "(integer) 0")
+        self.assertEqual(self.redis.execute("DBSIZE"), "(integer) 2")
+
+        keys_output = self.redis.execute("KEYS")
+        self.assertIn('"user:1"', keys_output)
+        self.assertIn('"user:2"', keys_output)
+
+        self.assertEqual(self.redis.execute("DEL user:1"), "(integer) 1")
+        self.assertEqual(self.redis.execute("DEL user:1"), "(integer) 0")
+        self.assertEqual(self.redis.execute("GET user:1"), "(nil)")
+        self.assertEqual(self.redis.execute("DBSIZE"), "(integer) 1")
+
+    def test_memory_management_and_lru_eviction(self) -> None:
+        """메모리 제한, 제거 통계, LRU 갱신, OOM 규칙을 검증한다."""
+        self.assertEqual(self.redis.execute("CONFIG SET maxmemory 30"), "OK")
+        self.assertEqual(self.redis.execute("SET user:1 abcde"), "OK")
+        self.assertEqual(self.redis.execute("SET user:2 fghij"), "OK")
+        self.assertEqual(self.redis.execute("SET user:3 klmno"), "OK")
+
+        self.assertEqual(self.redis.execute("GET user:1"), "(nil)")
+        info = self.redis.execute("INFO memory")
+        self.assertIn("used_memory:22", info)
+        self.assertIn("maxmemory:30", info)
+        self.assertIn("evicted_keys:1", info)
+
+        self.assertEqual(self.redis.execute("GET user:2"), '"fghij"')
+        self.assertEqual(self.redis.execute("SET user:4 pqrst"), "OK")
+        self.assertEqual(self.redis.execute("GET user:3"), "(nil)")
+        self.assertEqual(self.redis.execute("GET user:2"), '"fghij"')
+        self.assertEqual(self.redis.execute("GET user:4"), '"pqrst"')
+
+        self.assertEqual(self.redis.execute("CONFIG SET maxmemory 5"), "OK")
+        oom = self.redis.execute("SET giant 123456")
+        self.assertEqual(oom, "(error) OOM command not allowed when used memory > 'maxmemory'")
+        self.assertEqual(self.redis.execute("GET giant"), "(nil)")
+
+    def test_ttl_management_and_edge_cases(self) -> None:
+        """EXPIRE, TTL, 만료 후 GET, TTL 초기화, 즉시 만료, DEL 동기 정리를 검증한다."""
+        self.assertEqual(self.redis.execute("TTL missing"), "(integer) -2")
+
+        self.assertEqual(self.redis.execute("SET temp value"), "OK")
+        self.assertEqual(self.redis.execute("TTL temp"), "(integer) -1")
+        self.assertEqual(self.redis.execute("EXPIRE temp 10"), "(integer) 1")
+        self.assertEqual(self.redis.execute("TTL temp"), "(integer) 10")
+
+        self.clock.advance(4)
+        ttl_after_4 = self.redis.execute("TTL temp")
+        self.assertEqual(ttl_after_4, "(integer) 6")
+
+        self.clock.advance(7)
+        self.assertEqual(self.redis.execute("GET temp"), "(nil)")
+        self.assertEqual(self.redis.execute("TTL temp"), "(integer) -2")
+
+        self.assertEqual(self.redis.execute("SET keep old"), "OK")
+        self.assertEqual(self.redis.execute("EXPIRE keep 20"), "(integer) 1")
+        self.assertEqual(self.redis.execute("SET keep new"), "OK")
+        self.assertEqual(self.redis.execute("TTL keep"), "(integer) -1")
+
+        self.assertEqual(self.redis.execute("SET instant bye"), "OK")
+        self.assertEqual(self.redis.execute("EXPIRE instant 0"),
+[19:03:33]   검사 실패(1차): 파이썬 문법 오류: '(' was never closed (384행)
+[19:03:33]   출력이 잘렸다. 상한을 5000 로 올려 다시 요청한다
+
+----- write tests/test_mini_redis.py 재시도 / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 b5-1.md (앞 5000자)
+# b5-1. 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- **과정**: 자료구조와 알고리즘 (Data Structures & Algorithms)
+- **과제 번호**: `b5-1` (uqstnNo: 185008)
+
+---
+
+*(이미지)*
+
+### 1\. 미션 소개
+
+Redis를 써봤는데 왜 이렇게 빠른지 설명해보라고 하면 막히는 분들이 많습니다. 이유가 있습니다. 내부의 자료구조를 직접 구현해본 사람이 드물기 때문입니다. 해시맵, 이중 연결 리스트, 힙을 밑바닥부터 짜면서 LRU와 TTL이 어떻게 동작하는지 손으로 확인합니다.
+
+Redis는 전 세계에서 가장 널리 사용되는 In-Memory Key-Value 데이터 저장소입니다. 캐시, 메시지 브로커, 세션 저장소 등 다양한 용도로 활용되며, 그 핵심에는 효율적인 자료구조가 있습니다.
+
+이번 미션에서는 Redis의 핵심 기능을 직접 구현하며 CLI 기반 Mini Redis를 완성합니다. 해시맵, 이중 연결 리스트, 힙 같은 자료구조를 밑바닥부터 구현하면서 평소 당연하게 사용하던 내장 자료형의 내부 동작 원리를 깊이 이해하게 됩니다.
+
+또한, 실제 Redis가 메모리 제한 환경에서 어떻게 LRU 방식으로 오래된 데이터를 자동 제거하고, TTL을 통해 만료 시간을 관리하는지 직접 구현하며 체득합니다. 이 경험은 이후 알고리즘 학습, 코딩 테스트, 실제 서비스 성능 최적화로 확장될 수 있습니다.
+
+---
+
+### 2\. 최종 결과물
+
+다음 기능이 정상 동작하는 CLI 기반 Mini Redis 프로그램 1개를 완성한다.
+
+1.  String 타입 기본 명령어 (6개)
+    *   `SET`: 키에 값 저장 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `GET`: 키의 값 조회 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `DEL`: 키 삭제
+    *   `EXISTS`: 키 존재 여부 확인
+    *   `DBSIZE`: 전체 키 개수 반환
+    *   `KEYS`: 전체 키 목록 출력 (패턴 매칭은 구현하지 않음)
+2.  메모리 관리 명령어 (2개)
+    *   `CONFIG SET maxmemory`: 최대 메모리 제한 설정 (바이트 단위)
+    *   `INFO memory`: 현재 메모리 사용량, 제한, 제거된 키 개수 확인
+3.  TTL 관리 명령어 (2개)
+    *   `EXPIRE`: 키의 만료 시간 설정 (초 단위)
+    *   `TTL`: 키의 남은 만료 시간 조회
+4.  CLI 인터페이스
+    *   사용자가 명령어를 입력하면 즉시 실행 결과를 확인할 수 있는 REPL 환경
+    *   명령어 파싱, 실행, 결과 출력이 반복적으로 동작
+
+---
+
+### 3\. 과제 목표
+
+이 과제를 마친 후, 학습자는 아래를 스스로 설명할 수 있어야 한다.
+
+*   해시맵의 해시 함수와 충돌 해결 방식(체이닝)을 구현 코드를 기반으로 설명할 수 있다.
+*   이중 연결 리스트와 해시맵을 조합하여 O(1) LRU 추적이 가능한 이유를 설명할 수 있다.
+*   힙이 TTL 만료 시간 관리에 적합한 이유를 설명할 수 있다.
+*   메모리 제한 환경에서 LRU 정책으로 데이터를 제거하는 전체 흐름(used\_memory 갱신 포함)을 설명할 수 있다.
+
+---
+
+### 4\. 기능 요구 사항
+
+다음 요구사항을 모두 만족해야 한다.
+
+1.  기본 자료구조 직접 구현 (내장 Key-Value 컬렉션으로 대체 금지)
+    *   이중 연결 리스트
+        *   노드 구조: `prev`, `next`, `data` 필드
+        *   주요 메서드: `insert_front`, `insert_back`, `remove_front`, `remove_back`, `remove_node`, `move_to_front`
+        *   모든 삽입/삭제/이동 연산은 O(1)이어야 한다
+    *   해시맵 (체이닝 방식)
+        *   주요 메서드: `put`, `get`, `remove`, `contains`, `keys`, `size`
+        *   해시 함수는 직접 설계해야 한다
+        *   충돌 해결은 체이닝 방식으로 구현해야 한다 (권장: 이중 연결 리스트 재사용)
+        *   로드 팩터 0.75 초과 시 버킷을 2배 확장해야 한다
+    *   힙 (최소 힙)
+        *   주요 메서드: `push`, `pop`, `peek`, `size`
+        *   `_heapify_up`, `_heapify_down` 구현 필요
+        *   TTL 만료 관리를 위해 `(expire_at, key)` 형태의 요소를 다룰 수 있어야 한다
+2.  String 타입 명령어 (Redis 스타일 출력)
+    *   공통 규칙
+        *   키 기반 명령어는 실행 전 “만료 여부”를 먼저 확인할 수 있어야 한다 (만료된 키는 삭제 후 ‘없는 키’처럼 처리).
+        *   출력은 Redis 스타일을 따른다: `OK`, `(nil)`, `(integer) N`, `(error) ...`
+    *   `SET key value`
+        *   성공 시 `OK`
+        *   메모리 초과 시 LRU 제거를 수행한다(세부 규칙은 3번 참조)
+        *   기존 키를 덮어쓰는 경우: 기존 TTL은 “초기화(삭제)”한다
+    *   `GET key`
+        *   키가 없거나 만료된 경우 `(nil)`
+        *   존재하는 경우 `"value"` 형태로 반환
+        *   반환이 성공한 경우에만 LRU를 갱신한다 (만료로 삭제된 경우는 갱신하지 않음)
+    *   `DEL key`
+        *   삭제 성공 시 `(integer) 1`, 없으면 `(integer) 0`
+        *   삭제 시 LRU/TTL 관련 구조에서도 해당 엔트리를 함께 제거해야 한다
+    *   `EXISTS key`
+        *   존재하면 `(integer) 1`, 없으면 `(integer) 0`
+    *   `DBSIZE`
+        *   현재 저장된 키 개수를 `(integer) N`으로 반환
+    *   `KEYS`
+        *   전체 키 목록을 배열 형태로 출력 (정렬/순서는 요구하지 않음)
+        *   예시:
+            1.  "user:2"
+            2.  "user:3"
+        *   키가 없으면 `(empty array)` 같은 형태로 비어 있음을 표현해도 된다
+3.  메모리 관리 + LRU 자동 제거
+    *   `CONFIG SET maxmemory bytes`
+        *   `bytes`는 0 이상의 정수
+        *   0은 “무제한”으로 간주한다
+        *   성공 시 `OK`, 정수 파싱 실패 시 에러 표준을 따른다
+    *   `INFO memory`
+        *   아래 3개 항목을 최소 포함해 출력한다(표현 형태는 동일하면 됨): used\_memory:\ maxmemory:\ evicted\_keys:\
+    *   used\_memory 산정 기준(공식)
+        *   used\_memory = Σ( len(utf8(key)) + len(utf8(value)) )
+        *   자료구조(노드/포인터/버킷 등) 오버헤드는 계산에서 제외한다
+    *   LRU 제거 규칙
+        *   `maxmemory > 0`이고, SET 이후 used\_memory가 maxmemory를 초과하면 used\_memory가 maxmemory 이하가 될 때까지 “가장 오래 사용되지 않은 키(LRU)”부터 제거한다
+        *   제거된 키는 `evicted_keys`에 누적 카운트한다
+        *   만약 “단일 엔트리(키+값)” 자체가 maxmemory를 초과한다면:
+            *   저장하지 않고 에러(OOM)를 출력한다
+4.  TTL 관리 (힙 기반)
+    *   `EXPIRE key seconds`
+        *   key가 없으면 `(integer) 0`
+        *   seconds가 0 이하라면 “즉시 만료”로 처리해도 된다(존재하면 삭제 후 `(integer) 1`)
+        *   정상 설정 시 `(integer) 1`
+    *   `TTL key`
+        *   key가 없으면 `(integer) -2`
+        *   key는 존재하지만 만료 시간이 없으면 `(integer) -1`
+        *   만료 시간이 있으면 남은 초를 `(integer) N`으로 반환
+    *   TTL/LRU 엣지 케이스 최소 규칙(명시)
+        *   만료된 키는 GET 시 먼저 삭제 후 `(nil)`을 반환하며, LRU 갱신은 하지 않는다
+        *   SET이 기존 키를 덮어쓸 때 TTL은 초기화(삭제)한다
+        *   EXPIRE를 없는 키에 호출하면 `(integer) 0`이다
+        *   DEL은 데이터/TTL/LRU 모든 구조에서 엔트리를 함께 제거한다
+    *   구현 방식은 “힙을 통해 가장 빠른 만료를 빠르게 찾을 수 있어야 한다”는 목표를 만족하면 된다 (예: lazy deletion 전략 등은 구현 선택)
+5.  에러 처리 표준 + CLI 인터페이스
+    *   CLI
+        *   `mini-redis>` 프롬프트 출력
+        *   사용자 입력을 읽고 명령어 파싱 및 실행
+        *   `exit` 또는 `quit`으로 종료 가능
+    *   에러 출력(표준 형식 예시)
+        *   잘못된 명령: (error) ERR unknown command '\'
+        *   인자 개수 오류: (error) ERR wrong number of arguments for '\' command
+        *   정수 파싱 실패: (error) ERR value is not an integer or out of range
+  
+
+### 참고 파일 b5-1_eval.md
+# B5-1 · 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- 구분: 자료구조와 알고리즘
+- 필수/선택: 필수
+- 진행률: 0%
+
+## 체크리스트
+
+### 항목 1
+- [ ] String 타입 기본 동작: SET, GET, DEL, EXISTS, DBSIZE, KEYS 명령어가 모두 정상 동작하는가?
+- [ ] LRU 자동 제거: maxmemory 설정 후 제한 초과 시 가장 오래된 키가 자동 제거되는가?
+- [ ] 메모리 정보 확인: INFO memory에서 used_memory/maxmemory/evicted_keys가 규칙에 맞게 출력되는가?
+- [ ] TTL 관리: EXPIRE/TTL 규칙이 동작하며 만료된 키가 적절히 제거되는가?
+- [ ] 에러 처리: 잘못된 명령/인자/정수 오류/OOM이 표준 형식으로 출력되는가?
+
+### 항목 2
+- [ ] 이중 연결 리스트의 노드 구조(prev, next, data)와 핵심 메서드들이 O(1)로 동작하도록 어떻게 구성했는지 설명할 수 있는가?
+- [ ] 해시맵에서 직접 설계한 해시 함수가 어떤 입력을 받아 어떤 과정을 거쳐 인덱스를 만드는지 설명할 수 있는가?
+- [ ] 충돌 해결을 체이닝 방식으로 어떻게 구현했는지(버킷 내부 구조 선택 포함) 설명할 수 있는가?
+- [ ] 로드 팩터 0.75 초과 시 "버킷 2배 확장"을 어떤 절차로 수행하는지 설명할 수 있는가?
+
+### 항목 3
+- [ ] LRU 구현에
+[19:04:19] write      gpt-5.4        tests/test_mini_redis.py 재시도 입력   6246 출력  4942 차감  11188 누적   56508 (47초)
+
+----- write tests/test_mini_redis.py 재시도 / 응답 / gpt-5.4 -----
+"""Mini Redis 자료구조/명령어/CLI 통합 검증 테스트 스위트."""
+
+import importlib
+import os
+import subprocess
+import sys
+import time
+import unittest
+
+
+class FakeClock:
+    """시간 의존 로직을 결정적으로 검증하기 위한 가짜 시계이다."""
+
+    def __init__(self, start: float = 1000.0) -> None:
+        """고정 시작 시각으로 가짜 시계를 초기화한다."""
+        self.current = start
+
+    def now(self) -> float:
+        """현재 가짜 시각을 반환한다."""
+        return self.current
+
+    def advance(self, seconds: float) -> None:
+        """테스트가 만료 시점을 명시적으로 제어할 수 있게 시각을 전진시킨다."""
+        self.current += seconds
+
+
+def _import_attr(module_name: str, attr_name: str):
+    """프로젝트 구현 차이를 흡수하기 위해 모듈에서 속성을 동적으로 가져온다."""
+    module = importlib.import_module(module_name)
+    return getattr(module, attr_name)
+
+
+def _import_optional_attr(module_names: list[str], attr_name: str):
+    """여러 후보 모듈 중 실제로 구현된 위치에서 속성을 찾는다."""
+    last_error = None
+    for module_name in module_names:
+        try:
+            module = importlib.import_module(module_name)
+            if hasattr(module, attr_name):
+                return getattr(module, attr_name)
+        except Exception as error:
+            last_error = error
+    if last_error is not None:
+        raise last_error
+    raise AttributeError(attr_name)
+
+
+def _make_server(now_fn=None):
+    """Mini Redis 서버 인스턴스를 여러 생성자 형태에 맞춰 생성한다."""
+    candidates = [
+        ("mini_redis.core", "MiniRedis"),
+        ("mini_redis.redis", "MiniRedis"),
+        ("mini_redis.server", "MiniRedis"),
+        ("mini_redis.core", "MiniRedisServer"),
+        ("mini_redis.redis", "MiniRedisServer"),
+        ("mini_redis.server", "MiniRedisServer"),
+    ]
+
+    server_cls = _import_optional_attr(
+        [module_name for module_name, _ in candidates],
+        "MiniRedis",
+    )
+    if server_cls.__name__ != "MiniRedis":
+        server_cls = _import_optional_attr(
+            [module_name for module_name, _ in candidates],
+            "MiniRedisServer",
+        )
+
+    if now_fn is not None:
+        try:
+            return server_cls(now_fn=now_fn)
+        except TypeError:
+            instance = server_cls()
+            if hasattr(instance, "now_fn"):
+                instance.now_fn = now_fn
+            elif hasattr(instance, "_now_fn"):
+                instance._now_fn = now_fn
+            return instance
+
+    return server_cls()
+
+
+def _execute(server, command_line: str) -> str:
+    """구현체의 명령 실행 인터페이스 차이를 흡수해 문자열 결과를 얻는다."""
+    method_names = [
+        "execute",
+        "execute_command",
+        "run_command",
+        "handle_command",
+        "process_command",
+    ]
+
+    last_error = None
+    for method_name in method_names:
+        if hasattr(server, method_name):
+            method = getattr(server, method_name)
+            try:
+                result = method(command_line)
+            except TypeError:
+                parts = command_line.split()
+                result = method(parts)
+            if isinstance(result, str):
+                return result
+            return str(result)
+
+    try:
+        cli_module = importlib.import_module("mini_redis.cli")
+        if hasattr(cli_module, "execute_command"):
+            result = cli_module.execute_command(server, command_line)
+            if isinstance(result, str):
+                return result
+            return str(result)
+    except Exception as error:
+        last_error = error
+
+    if last_error is not None:
+        raise last_error
+    raise AttributeError("No executable command interface found.")
+
+
+def _normalize_lines(text: str) -> str:
+    """플랫폼 개행 차이로 인한 오탐을 줄이기 위해 문자열을 정규화한다."""
+    return text.replace("\r\n", "\n").strip()
+
+
+class TestDoublyLinkedList(unittest.TestCase):
+    """이중 연결 리스트의 핵심 포인터 연산을 검증한다."""
+
+    def setUp(self) -> None:
+        """각 테스트 전에 새 리스트를 준비한다."""
+        self.Node = _import_attr("mini_redis.linked_list", "Node")
+        self.DoublyLinkedList = _import_attr("mini_redis.linked_list", "DoublyLinkedList")
+
+    def test_insert_front_and_back(self) -> None:
+        """앞뒤 삽입이 head/tail과 이웃 포인터를 올바르게 만든다."""
+        linked = self.DoublyLinkedList()
+
+        n2 = linked.insert_front("b")
+        n1 = linked.insert_front("a")
+        n3 = linked.insert_back("c")
+
+        self.assertEqual(linked.head.data, "a")
+        self.assertEqual(linked.tail.data, "c")
+        self.assertIs(linked.head, n1)
+        self.assertIs(linked.tail, n3)
+        self.assertIsNone(n1.prev)
+        self.assertIs(n1.next, n2)
+        self.assertIs(n2.prev, n1)
+        self.assertIs(n2.next, n3)
+        self.assertIs(n3.prev, n2)
+        self.assertIsNone(n3.next)
+
+    def test_remove_front_and_back_on_empty_and_singleton(self) -> None:
+        """빈 리스트와 단일 원소 리스트의 제거 경계를 검증한다."""
+        linked = self.DoublyLinkedList()
+
+        self.assertIsNone(linked.remove_front())
+        self.assertIsNone(linked.remove_back())
+
+        linked.insert_front("only")
+        self.assertEqual(linked.remove_front(), "only")
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+
+        linked.insert_back("only")
+        self.assertEqual(linked.remove_back(), "only")
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+
+    def test_remove_node_middle_head_tail(self) -> None:
+        """임의 노드 제거가 탐색 없이 구조를 보존하는지 검증한다."""
+        linked = self.DoublyLinkedList()
+        n1 = linked.insert_back("a")
+        n2 = linked.insert_back("b")
+        n3 = linked.insert_back("c")
+
+        linked.remove_node(n2)
+        self.assertEqual(linked.head.data, "a")
+        self.assertEqual(linked.tail.data, "c")
+        self.assertIs(n1.next, n3)
+        self.assertIs(n3.prev, n1)
+        self.assertIsNone(n2.prev)
+        self.assertIsNone(n2.next)
+
+        linked.remove_node(n1)
+        self.assertEqual(linked.head.data, "c")
+        self.assertEqual(linked.tail.data, "c")
+        self.assertIsNone(n3.prev)
+
+        linked.remove_node(n3)
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+
+    def test_move_to_front(self) -> None:
+        """중간/끝 노드를 앞으로 옮길 때 순서가 올바르게 갱신된다."""
+        linked = self.DoublyLinkedList()
+        n1 = linked.insert_back("a")
+        n2 = linked.insert_back("b")
+        n3 = linked.insert_back("c")
+
+        linked.move_to_front(n3)
+        self.assertIs(linked.head, n3)
+        self.assertIs(linked.tail, n2)
+        self.assertIsNone(n3.prev)
+        self.assertIs(n3.next, n1)
+        self.assertIs(n1.prev, n3)
+        self.assertIs(n1.next, n2)
+        self.assertIs(n2.prev, n1)
+
+        linked.move_to_front(n1)
+        self.assertIs(linked.head, n1)
+        self.assertEqual(linked.head.data, "a")
+        self.assertEqual(linked.tail.data, "b")
+
+        linked.move_to_front(n1)
+        self.assertIs(linked.head, n1)
+        self.assertEqual(linked.head.data, "a")
+
+
+class TestHashMap(unittest.TestCase):
+    """체이닝 해시맵의 충돌 처리와 리사이즈 규칙을 검증한다."""
+
+    def setUp(self) -> None:
+        """각 테스트 전에 해시맵 클래스를 불러온다."""
+        self.HashMap = _import_attr("mini_redis.hashmap", "HashMap")
+
+    def test_hash_index_in_range(self) -> None:
+        """해시 함수는 항상 현재 버킷 범위 안의 인덱스를 반환해야 한다."""
+        hashmap = self.HashMap()
+        for key in ["a", "abc", "user:1", "한글", "long-key-value"]:
+            index = hashmap._hash(key)
+            self.assertGreaterEqual(index, 0)
+            self.assertLess(index, hashmap._capacity)
+
+    def test_put_get_remove_contains_keys_size(self) -> None:
+        """기본 CRUD와 메타 정보 메서드가 일관되게 동작해야 한다."""
+        hashmap = self.HashMap()
+
+        hashmap.put("user:1", "A")
+        hashmap.put("user:2", "B")
+        hashmap.put("user:1", "AA")
+
+        self.assertEqual(hashmap.get("user:1"), "AA")
+        self.assertEqual(hashmap.get("user:2"), "B")
+        self.assertTrue(hashmap.contains("user:1"))
+        self.assertFalse(hashmap.contains("user:3"))
+        self.assertEqual(hashmap.size(), 2)
+
+        keys = hashmap.keys()
+        self.assertEqual(len(keys), 2)
+        self.assertIn("user:1", keys)
+        self.assertIn("user:2", keys)
+
+        self.assertTrue(hashmap.remove("user:2"))
+        self.assertFalse(hashmap.remove("user:2"))
+        self.assertIsNone(hashmap.get("user:2"))
+        self.assertEqual(hashmap.size(), 1)
+
+    def test_chaining_collision_resolution(self) -> None:
+        """같은 버킷에 몰린 키들도 각각 독립적으로 조회/삭제되어야 한다."""
+        class CollisionHashMap(self.HashMap):
+            """충돌 상황을 강제로 만들기 위한 테스트 전용 해시맵이다."""
+
+            def _hash(self, key: str) -> int:
+                """모든 키를 같은 버킷으로 보내 체이닝 구현을 직접 검증한다."""
+                return 0
+
+        hashmap = CollisionHashMap()
+        hashmap.put("k1", "v1")
+        hashmap.put("k2", "v2")
+        hashmap.put("k3", "v3")
+
+        self.assertEqual(hashmap.get("k1"), "v1")
+        self.assertEqual(hashmap.get("k2"), "v2")
+        self.assertEqual(hashmap.get("k3"), "v3")
+        self.assertTrue(hashmap.remove("k2"))
+        self.assertEqual(hashmap.get("k1"), "v1")
+        self.assertIsNone(hashmap.get("k2"))
+        self.assertEqual(hashmap.get("k3"), "v3")
+        self.assertEqual(hashmap.size(), 2)
+
+    def test_resize_when_load_factor_exceeds_threshold(self) -> None:
+        """8칸 테이블은 7번째 새 키에서 16칸으로 늘어나야 한다."""
+        hashmap = self.HashMap(8)
+
+        for index in range(6):
+            hashmap.put("k" + str(index), "v" + str(index))
+        self.assertEqual(hashmap._capacity, 8)
+
+        hashmap.put("k6", "v6")
+        self.assertEqual(hashmap._capacity, 16)
+
+        for index in range(7):
+            self.assertEqual(hashmap.get("k" + str(index)), "v" + str(index))
+
+
+class TestMinHeap(unittest.TestCase):
+    """최소 힙의 TTL 우선순위 동작을 검증한다."""
+
+    def setUp(self) -> None:
+        """각 테스트 전에 최소 힙 클래스를 불러온다."""
+        self.MinHeap = _import_attr("mini_redis.heap", "MinHeap")
+
+    def test_push_peek_size(self) -> None:
+        """삽입 후 루트 최소값과 크기 정보가 일치해야 한다."""
+        heap = self.MinHeap()
+        self.assertEqual(heap.size(), 0)
+        self.assertIsNone(heap.peek())
+
+        heap.push((30.0, "c"))
+        heap.push((10.0, "a"))
+        heap.push((20.0, "b"))
+
+        self.assertEqual(heap.size(), 3)
+        self.assertEqual(heap.peek(), (10.0, "a"))
+
+    def test_pop_in_sorted_expire_order(self) -> None:
+        """pop은 가장 이른 만료 시각부터 반환해야 한다."""
+        heap = self.MinHeap()
+        items = [(30.0, "c"), (10.0, "a"), (20.0, "b"), (10.0, "aa")]
+        for item in items:
+            heap.push(item)
+
+        popped = [heap.pop(), heap.pop(), heap.pop(), heap.pop(), heap.pop()]
+        self.assertEqual(popped[0], (10.0, "a"))
+        self.assertEqual(popped[1], (10.0, "aa"))
+        self.assertEqual(popped[2], (20.0, "b"))
+        self.assertEqual(popped[3], (30.0, "c"))
+        self.assertIsNone(popped[4])
+        self.assertEqual(heap.size(), 0)
+
+
+class TestMiniRedisCommands(unittest.TestCase):
+    """문자열 명령어, 메모리 관리, TTL, 에러 처리를 통합 검증한다."""
+
+    def setUp(self) -> None:
+        """각 테스트 전에 독립된 서버 인스턴스를 준비한다."""
+        self.clock = FakeClock()
+        self.server = _make_server(now_fn=self.clock.now)
+
+    def cmd(self, line: str) -> str:
+        """짧은 표기로 명령을 실행한다."""
+        return _normalize_lines(_execute(self.server, line))
+
+    def test_string_commands_and_empty_keys_output(self) -> None:
+        """문자열 명령어 6종의 기본 규칙과 빈 키 목록 표현을 검증한다."""
+        self.assertEqual(self.cmd("GET no-key"), "(nil)")
+        self.assertEqual(self.cmd("EXISTS no-key"), "(integer) 0")
+        self.assertEqual(self.cmd("DBSIZE"), "(integer) 0")
+
+        keys_output = self.cmd("KEYS")
+        self.assertIn("(empty array)", keys_output)
+
+        self.assertEqual(self.cmd("SET user:1 Alice"), "OK")
+        self.assertEqual(self.cmd("GET user:1"), '"Alice"')
+        self.assertEqual(self.cmd("EXISTS user:1"), "(integer) 1")
+        self.assertEqual(self.cmd("DBSIZE"), "(integer) 1")
+
+        self.assertEqual(self.cmd("SET user:2 Bob"), "OK")
+        keys_output = self.cmd("KEYS")
+        self.assertIn('"user:1"', keys_output)
+        self.assertIn('"user:2"', keys_output)
+
+        self.assertEqual(self.cmd("DEL user:1"), "(integer) 1")
+        self.assertEqual(self.cmd("DEL user:1"), "(integer) 0")
+        self.assertEqual(self.cmd("GET user:1"), "(nil)")
+        self.assertEqual(self.cmd("DBSIZE"), "(integer) 1")
+
+    def test_memory_info_and_lru_eviction(self) -> None:
+        """메모리 제한 초과 시 가장 오래 사용되지 않은 키부터 제거되어야 한다."""
+        self.assertEqual(self.cmd("CONFIG SET maxmemory 30"), "OK")
+        self.assertEqual(self.cmd("SET user:1 abcde"), "OK")
+        self.assertEqual(self.cmd("SET user:2 abcde"), "OK")
+        self.assertEqual(self.cmd("SET user:3 abcde"), "OK")
+
+        self.assertEqual(self.cmd("GET user:1"), "(nil)")
+        info = self.cmd("INFO memory")
+        self.assertIn("used_memory:22", info)
+        self.assertIn("maxmemory:30", info)
+        self.assertIn("evicted_keys:1", info)
+        self.assertEqual(self.cmd("GET user:2"), '"abcde"')
+        self.assertEqual(self.cmd("GET user:3"), '"abcde"')
+
+    def test_get_updates_lru_order_before_next_eviction(self) -> None:
+        """성공한 GET만 최신 사용으로 승격되어 다음 제거 대상을 바꿔야 한다."""
+        self.assertEqual(self.cmd("CONFIG SET maxmemory 24"), "OK")
+        self.assertEqual(self.cmd("SET a 1234567"), "OK")
+        self.assertEqual(self.cmd("SET b 1234567"), "OK")
+        self.assertEqual(self.cmd("GET a"), '"1234567"')
+        self.assertEqual(self.cmd("SET c 1234567"), "OK")
+
+        self.assertEqual(self.cmd("GET a"), '"1234567"')
+        self.assertEqual(self.cmd("GET b"), "(nil)")
+        self.assertEqual(self.cmd("GET c"), '"1234567"')
+
+    def test_single_entry_larger_than_maxmemory_returns_oom(self) -> None:
+        """단일 엔트리 자체가 제한을 넘으면 저장하지 않고 OOM이어야 한다."""
+        self.assertEqual(self.cmd("CONFIG SET maxmemory 5"), "OK")
+        result = self.cmd("SET too_big 123456")
+        self.assertEqual(result, "(error) OOM command not allowed when used memory > 'maxmemory'")
+        self.assertEqual(self.cmd("GET too_big"), "(nil)")
+        self.assertEqual(self.cmd("DBSIZE"), "(integer) 0")
+
+    def test_ttl_lifecycle_and_edge_cases(self) -> None:
+        """TTL 조회 규칙, 만료 삭제, 덮어쓰기 초기화, 즉시 만료를 검증한다."""
+        self.assertEqual(self.cmd("TTL no-key"), "(integer) -2")
+
+        self.assertEqual(self.cmd("SET session token"), "OK")
+        self.assertEqual(self.cmd("TTL session"), "(integer) -1")
+        self.assertEqual(self.cmd("EXPIRE session 10"), "(integer) 1")
+        self.assertEqual(self.cmd("TTL session"), "(integer) 10")
+
+        self.clock.advance(3)
+        ttl_after_3 = self.cmd("TTL session")
+        self.assertEqual(ttl_after_3, "(integer) 7")
+
+        self.clock.advance(8)
+        self.assertEqual(self.cmd("GET session"), "(nil)")
+        self.assertEqual(self.cmd("TTL session"), "(integer) -2")
+
+        self.assertEqual(self.cmd("SET user value1"), "OK")
+        self.assertEqual(self.cmd("EXPIRE user 100"), "(integer) 1")
+        self.assertEqual(self.cmd("SET user value2"), "OK")
+        self.assertEqual(self.cmd("TTL user"), "(integer) -1")
+
+        self.assertEqual(self.cmd("SET temp value"), "OK")
+        self.assertEqual(self.cmd("EXPIRE temp 0"), "(integer) 1")
+        self.assertEqual(self.cmd("GET temp"), "(nil)")
+        self.assertEqual(self.cmd("TTL temp"), "(integer) -2")
+
+        self.assertEqual(self.cmd("EXPIRE no-key 10"), "(integer) 0")
+
+    def test_expired_get_does_not_refresh_lru(self) -> None:
+        """만료로 사라진 GET은 사용 갱신이 아니므로 다른 키를 밀어내지 않아야 한다."""
+        self.assertEqual(self.cmd("CONFIG SET maxmemory 12"), "OK")
+        self.assertEqual(self.cmd("SET a 12345"), "OK")
+        self.assertEqual(self.cmd("SET b 12345"), "OK")
+        self.assertEqual(self.cmd("EXPIRE a 1"), "(integer) 1")
+
+        self.clock.advance(2)
+        self.assertEqual(self.cmd("GET a"), "(nil)")
+        self.assertEqual(self.cmd("SET c 12345"), "OK")
+
+        self.assertEqual(self.cmd("GET b"), '"12345"')
+        self.assertEqual(self.cmd("GET c"), '"12345"')
+
+    def test_del_removes_data_ttl_and_lru_together(self) -> None:
+        """DEL 이후에는 데이터 조회, TTL 조회, 존재 여부가 모두 비어 있어야 한다."""
+        self.assertEqual(self.cmd("SET key value"), "OK")
+        self.assertEqual(self.cmd("EXPIRE key 10"), "(integer) 1")
+        self.assertEqual(self.cmd("DEL key"), "(integer) 1")
+        self.assertEqual(self.cmd("GET key"), "(nil)")
+        self.assertEqual(self.cmd("TTL key"), "(integer) -2")
+        self.assertEqual(self.cmd("EXISTS key"), "(integer) 0")
+
+    def test_error_messages(self) -> None:
+        """표준 에러 메시지 4종이 요구 형식과 일치해야 한다."""
+        self.assertEqual(self.cmd("NOPE"), "(error) ERR unknown command 'NOPE'")
+        self.assertEqual(self.cmd("GET"), "(error) ERR wrong number of arguments for 'GET' command")
+        self.assertEqual(
+            self.cmd("CONFIG SET maxmemory not-int"),
+            "(error) ERR value is not an integer or out of range",
+        )
+        self.assertEqual(self.cmd("CONFIG SET maxmemory 3"), "OK")
+        self.assertEqual(
+            self.cmd("SET k 1234"),
+            "(error) OOM command not allowed when used memory > 'maxmemory'",
+        )
+
+
+class TestMiniRedisRepl(unittest.TestCase):
+    """실제 python -m mini_redis 프로세스를 띄워 REPL 동작을 검증한다."""
+
+    def test_repl_subprocess_integration(self) -> None:
+        """stdin/stdout 기반 상호작용이 프롬프트와 함께 정상 동작해야 한다."""
+        env = os.environ.copy()
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        python_path = env.get("PYTHONPATH", "")
+        if python_path:
+            env["PYTHONPATH"] = project_root + os.pathsep + python_path
+        else:
+            env["PYTHONPATH"] = project_root
+
+        process = subprocess.Popen(
+            [sys.executable, "-m", "mini_redis"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            cwd=project_root,
+            env=env,
+        )
+
+        try:
+            commands = "SET user:1 Alice\nGET user:1\nKEYS\nquit\n"
+            stdout, stderr = process.communicate(commands, timeout=5)
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=5)
+
+        self.assertEqual(process.returncode, 0, msg=stderr)
+        normalized = _normalize_lines(stdout)
+        self.assertIn("mini-redis>", normalized)
+        self.assertIn("OK", normalized)
+        self.assertIn('"Alice"', normalized)
+        self.assertIn('"user:1"', normalized)
+
+
+if __name__ == "__main__":
+    unittest.main()
+[19:04:19]   작성 tests/test_mini_redis.py (511줄)
+[19:04:19] 끝. 생성 8, 건너뜀 0, 실패 0, 차감 누적 56508
+[19:05:35] ======================================================================
+[19:05:35] 시작 C:\Users\roina\.gemini\antigravity\brain\0327280a-f101-4e9f-9701-4ac103964371\scratch\b5_1_spec.json -> c:\Users\roina\Desktop\code\codyssey\2.Element(260903-Now)\b5-1 (8개 파일)
+
+----- write tests/test_mini_redis.py / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 b5-1.md (앞 4000자)
+# b5-1. 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- **과정**: 자료구조와 알고리즘 (Data Structures & Algorithms)
+- **과제 번호**: `b5-1` (uqstnNo: 185008)
+
+---
+
+*(이미지)*
+
+### 1\. 미션 소개
+
+Redis를 써봤는데 왜 이렇게 빠른지 설명해보라고 하면 막히는 분들이 많습니다. 이유가 있습니다. 내부의 자료구조를 직접 구현해본 사람이 드물기 때문입니다. 해시맵, 이중 연결 리스트, 힙을 밑바닥부터 짜면서 LRU와 TTL이 어떻게 동작하는지 손으로 확인합니다.
+
+Redis는 전 세계에서 가장 널리 사용되는 In-Memory Key-Value 데이터 저장소입니다. 캐시, 메시지 브로커, 세션 저장소 등 다양한 용도로 활용되며, 그 핵심에는 효율적인 자료구조가 있습니다.
+
+이번 미션에서는 Redis의 핵심 기능을 직접 구현하며 CLI 기반 Mini Redis를 완성합니다. 해시맵, 이중 연결 리스트, 힙 같은 자료구조를 밑바닥부터 구현하면서 평소 당연하게 사용하던 내장 자료형의 내부 동작 원리를 깊이 이해하게 됩니다.
+
+또한, 실제 Redis가 메모리 제한 환경에서 어떻게 LRU 방식으로 오래된 데이터를 자동 제거하고, TTL을 통해 만료 시간을 관리하는지 직접 구현하며 체득합니다. 이 경험은 이후 알고리즘 학습, 코딩 테스트, 실제 서비스 성능 최적화로 확장될 수 있습니다.
+
+---
+
+### 2\. 최종 결과물
+
+다음 기능이 정상 동작하는 CLI 기반 Mini Redis 프로그램 1개를 완성한다.
+
+1.  String 타입 기본 명령어 (6개)
+    *   `SET`: 키에 값 저장 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `GET`: 키의 값 조회 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `DEL`: 키 삭제
+    *   `EXISTS`: 키 존재 여부 확인
+    *   `DBSIZE`: 전체 키 개수 반환
+    *   `KEYS`: 전체 키 목록 출력 (패턴 매칭은 구현하지 않음)
+2.  메모리 관리 명령어 (2개)
+    *   `CONFIG SET maxmemory`: 최대 메모리 제한 설정 (바이트 단위)
+    *   `INFO memory`: 현재 메모리 사용량, 제한, 제거된 키 개수 확인
+3.  TTL 관리 명령어 (2개)
+    *   `EXPIRE`: 키의 만료 시간 설정 (초 단위)
+    *   `TTL`: 키의 남은 만료 시간 조회
+4.  CLI 인터페이스
+    *   사용자가 명령어를 입력하면 즉시 실행 결과를 확인할 수 있는 REPL 환경
+    *   명령어 파싱, 실행, 결과 출력이 반복적으로 동작
+
+---
+
+### 3\. 과제 목표
+
+이 과제를 마친 후, 학습자는 아래를 스스로 설명할 수 있어야 한다.
+
+*   해시맵의 해시 함수와 충돌 해결 방식(체이닝)을 구현 코드를 기반으로 설명할 수 있다.
+*   이중 연결 리스트와 해시맵을 조합하여 O(1) LRU 추적이 가능한 이유를 설명할 수 있다.
+*   힙이 TTL 만료 시간 관리에 적합한 이유를 설명할 수 있다.
+*   메모리 제한 환경에서 LRU 정책으로 데이터를 제거하는 전체 흐름(used\_memory 갱신 포함)을 설명할 수 있다.
+
+---
+
+### 4\. 기능 요구 사항
+
+다음 요구사항을 모두 만족해야 한다.
+
+1.  기본 자료구조 직접 구현 (내장 Key-Value 컬렉션으로 대체 금지)
+    *   이중 연결 리스트
+        *   노드 구조: `prev`, `next`, `data` 필드
+        *   주요 메서드: `insert_front`, `insert_back`, `remove_front`, `remove_back`, `remove_node`, `move_to_front`
+        *   모든 삽입/삭제/이동 연산은 O(1)이어야 한다
+    *   해시맵 (체이닝 방식)
+        *   주요 메서드: `put`, `get`, `remove`, `contains`, `keys`, `size`
+        *   해시 함수는 직접 설계해야 한다
+        *   충돌 해결은 체이닝 방식으로 구현해야 한다 (권장: 이중 연결 리스트 재사용)
+        *   로드 팩터 0.75 초과 시 버킷을 2배 확장해야 한다
+    *   힙 (최소 힙)
+        *   주요 메서드: `push`, `pop`, `peek`, `size`
+        *   `_heapify_up`, `_heapify_down` 구현 필요
+        *   TTL 만료 관리를 위해 `(expire_at, key)` 형태의 요소를 다룰 수 있어야 한다
+2.  String 타입 명령어 (Redis 스타일 출력)
+    *   공통 규칙
+        *   키 기반 명령어는 실행 전 “만료 여부”를 먼저 확인할 수 있어야 한다 (만료된 키는 삭제 후 ‘없는 키’처럼 처리).
+        *   출력은 Redis 스타일을 따른다: `OK`, `(nil)`, `(integer) N`, `(error) ...`
+    *   `SET key value`
+        *   성공 시 `OK`
+        *   메모리 초과 시 LRU 제거를 수행한다(세부 규칙은 3번 참조)
+        *   기존 키를 덮어쓰는 경우: 기존 TTL은 “초기화(삭제)”한다
+    *   `GET key`
+        *   키가 없거나 만료된 경우 `(nil)`
+        *   존재하는 경우 `"value"` 형태로 반환
+        *   반환이 성공한 경우에만 LRU를 갱신한다 (만료로 삭제된 경우는 갱신하지 않음)
+    *   `DEL key`
+        *   삭제 성공 시 `(integer) 1`, 없으면 `(integer) 0`
+        *   삭제 시 LRU/TTL 관련 구조에서도 해당 엔트리를 함께 제거해야 한다
+    *   `EXISTS key`
+        *   존재하면 `(integer) 1`, 없으면 `(integer) 0`
+    *   `DBSIZE`
+        *   현재 저장된 키 개수를 `(integer) N`으로 반환
+    *   `KEYS`
+        *   전체 키 목록을 배열 형태로 출력 (정렬/순서는 요구하지 않음)
+        *   예시:
+            1.  "user:2"
+            2.  "user:3"
+        *   키가 없으면 `(empty array)` 같은 형태로 비어 있음을 표현해도 된다
+3.  메모리 관리 + LRU 자동 제거
+    *   `CONFIG SET maxmemory bytes`
+        *   `bytes`는 0 이상의 정수
+        *   0은 “무제한”으로 간주한다
+        *   성공 시 `OK`, 정수 파싱 실패 시 에러 표준을 따른다
+    *   `INFO memory`
+        *   아래 3개 항목을 최소 포함해 출력한다(표현 형태는 동일하면 됨): used\_memory:\ maxmemory:\ evicted\_keys:\
+    *   used\_memory 산정 기준(공식)
+        *   used\_memory = Σ( len(utf8(key)) + len(utf8(value)) )
+        *   자료구조(노드/포인터/버킷 등) 오버헤드는 계산에서 제외한다
+    *   LRU 제거 규칙
+        *   `maxmemory > 0`이고, SET 이후 used\_memory가 maxmemory를 초과하면 used\_memory가 maxmemory 이하가 될 때까지 “가장 오래 사용되지 않은 키(LRU)”부터 제거한다
+        *   제거된 키는 `evicted_keys`에 누적 카운트한다
+        *   만약 “단일 엔트리(키+값)” 자체가 maxmemory를 초과한다면:
+            *   저장하지 않고 에러(OOM)를 출력한다
+4.  TTL 관리 (힙 기반)
+    *   `EXPIRE key 
+
+### 참고 파일 b5-1_eval.md
+# B5-1 · 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- 구분: 자료구조와 알고리즘
+- 필수/선택: 필수
+- 진행률: 0%
+
+## 체크리스트
+
+### 항목 1
+- [ ] String 타입 기본 동작: SET, GET, DEL, EXISTS, DBSIZE, KEYS 명령어가 모두 정상 동작하는가?
+- [ ] LRU 자동 제거: maxmemory 설정 후 제한 초과 시 가장 오래된 키가 자동 제거되는가?
+- [ ] 메모리 정보 확인: INFO memory에서 used_memory/maxmemory/evicted_keys가 규칙에 맞게 출력되는가?
+- [ ] TTL 관리: EXPIRE/TTL 규칙이 동작하며 만료된 키가 적절히 제거되는가?
+- [ ] 에러 처리: 잘못된 명령/인자/정수 오류/OOM이 표준 형식으로 출력되는가?
+
+### 항목 2
+- [ ] 이중 연결 리스트의 노드 구조(prev, next, data)와 핵심 메서드들이 O(1)로 동작하도록 어떻게 구성했는지 설명할 수 있는가?
+- [ ] 해시맵에서 직접 설계한 해시 함수가 어떤 입력을 받아 어떤 과정을 거쳐 인덱스를 만드는지 설명할 수 있는가?
+- [ ] 충돌 해결을 체이닝 방식으로 어떻게 구현했는지(버킷 내부 구조 선택 포함) 설명할 수 있는가?
+- [ ] 로드 팩터 0.75 초과 시 "버킷 2배 확장"을 어떤 절차로 수행하는지 설명할 수 있는가?
+
+### 항목 3
+- [ ] LRU 구현에서 "해시맵 + 이중 연결 리스트"가 각각 어떤 역할을 하고, 왜 둘 다 필요한지 설명할 수 있는가?
+- [ ] O(1) LRU 달성 원리를 "조회(해시) + 갱신(리스트 이동)" 관점에서 설명할 수 있는가?
+- [ ] TTL 관리에 힙을 사용한 이유(가장 빠른 만료를 빠르게 찾는 성질)를 설명할 수 있는가?
+- [ ] 메모리 초과 시 eviction 흐름을 단계별로 설명할 수 있는가? (used_memory 산정/갱신, LRU 제거, evicted_keys 증가 포함)
+- [ ] GET 명령어 전체 흐름을 순서대로 설명할 수 있는가? (TTL 확인 → 삭제 여부 → 값 반환 → LRU 갱신 조건)
+
+### 항목 4
+- [ ] "만약 LRU 대신 LFU 정책을 구현한다면 자료구조를 어떻게 변경해야 하는가?"에 합리적으로 답변할 수 있는가?
+- [ ] "데이터가 10만 건으로 늘어나면 현재 구조에서 병목이 될 수 있는 부분은 어디이며, 어떻게 개선할 수 있는가?"에 답변할 수 있는가?
+- [ ] "used_memory에 자료구조 오버헤드까지 포함하는 모델로 바꾸면 무엇이 달라지고, 공정한 비교/채점을 위해 어떤 보정이 필요할지" 설명할 수 있는가?
+
+
+### 참고 파일 mini_redis/store.py (앞 4500자)
+import math
+import time
+
+from .errors import OOMError
+from .hashmap import HashMap
+from .heap import MinHeap
+from .linked_list import DoublyLinkedList, Node
+
+
+class MiniRedisStore:
+    """해시맵, LRU 리스트, TTL 최소 힙을 결합한 핵심 저장소 엔진이다."""
+
+    def __init__(self, now_fn: 'object' = None) -> None:
+        """저장소의 모든 인덱스와 통계를 초기화한다.
+
+        테스트에서는 시간을 고정해야 TTL 동작을 안정적으로 
+[19:06:14] write      gpt-5.4        tests/test_mini_redis.py 입력   6153 출력  4000 차감  10153 누적   10153 (39초)
+
+----- write tests/test_mini_redis.py / 응답 / gpt-5.4 -----
+import subprocess
+import sys
+import unittest
+
+from mini_redis.commands import execute
+from mini_redis.hashmap import HashMap
+from mini_redis.heap import MinHeap
+from mini_redis.linked_list import DoublyLinkedList, Node
+from mini_redis.parser import tokenize
+from mini_redis.store import MiniRedisStore
+
+
+class FakeClock:
+    """테스트가 시간 흐름을 결정적으로 제어하도록 돕는 가짜 시계이다."""
+
+    def __init__(self, start: float = 0.0) -> None:
+        """초기 시각을 설정한다."""
+        self.current = start
+
+    def now(self) -> float:
+        """현재 시각을 반환한다."""
+        return self.current
+
+    def advance(self, seconds: float) -> None:
+        """테스트가 원하는 만큼 시간을 전진시킨다."""
+        self.current += seconds
+
+
+class BadHashKey:
+    """같은 해시값을 강제로 만들어 체이닝 충돌 처리를 검증하는 테스트 키이다."""
+
+    def __init__(self, name: str, forced_hash: int) -> None:
+        """표시용 이름과 강제 해시값을 저장한다."""
+        self.name = name
+        self.forced_hash = forced_hash
+
+    def __hash__(self) -> int:
+        """충돌 시나리오를 재현하기 위해 같은 해시값을 돌려준다."""
+        return self.forced_hash
+
+    def __eq__(self, other: object) -> bool:
+        """충돌한 키들이 이름으로 구분되도록 한다."""
+        if not isinstance(other, BadHashKey):
+            return False
+        return self.name == other.name and self.forced_hash == other.forced_hash
+
+    def __repr__(self) -> str:
+        """실패 시 어떤 키인지 빠르게 식별할 수 있게 한다."""
+        return self.name
+
+
+class DoublyLinkedListTestCase(unittest.TestCase):
+    """이중 연결 리스트의 O(1) 조작 계약을 검증한다."""
+
+    def test_insert_front_and_back_build_expected_order(self) -> None:
+        """양끝 삽입이 연결 관계와 순서를 정확히 만든다."""
+        linked = DoublyLinkedList()
+
+        first = linked.insert_front("b")
+        second = linked.insert_front("a")
+        third = linked.insert_back("c")
+
+        self.assertIsInstance(first, Node)
+        self.assertIsInstance(second, Node)
+        self.assertIsInstance(third, Node)
+
+        self.assertEqual(linked.head.data, "a")
+        self.assertEqual(linked.head.next.data, "b")
+        self.assertEqual(linked.tail.data, "c")
+        self.assertEqual(linked.tail.prev.data, "b")
+
+    def test_remove_front_and_back_on_empty_and_non_empty(self) -> None:
+        """비어 있는 경우와 값이 있는 경우 모두 안전하게 동작해야 한다."""
+        linked = DoublyLinkedList()
+
+        self.assertIsNone(linked.remove_front())
+        self.assertIsNone(linked.remove_back())
+
+        linked.insert_back("a")
+        linked.insert_back("b")
+        linked.insert_back("c")
+
+        self.assertEqual(linked.remove_front(), "a")
+        self.assertEqual(linked.remove_back(), "c")
+        self.assertEqual(linked.remove_back(), "b")
+        self.assertIsNone(linked.remove_front())
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+
+    def test_remove_node_handles_middle_head_tail_and_singleton(self) -> None:
+        """임의 노드 삭제가 경계 위치마다 연결 불일치를 남기지 않아야 한다."""
+        linked = DoublyLinkedList()
+        n1 = linked.insert_back("a")
+        n2 = linked.insert_back("b")
+        n3 = linked.insert_back("c")
+
+        linked.remove_node(n2)
+        self.assertEqual(linked.head.data, "a")
+        self.assertEqual(linked.tail.data, "c")
+        self.assertIs(linked.head.next, linked.tail)
+        self.assertIs(linked.tail.prev, linked.head)
+
+        linked.remove_node(n1)
+        self.assertEqual(linked.head.data, "c")
+        self.assertEqual(linked.tail.data, "c")
+
+        linked.remove_node(n3)
+        self.assertIsNone(linked.head)
+        self.assertIsNone(linked.tail)
+
+    def test_move_to_front_updates_recency_order(self) -> None:
+        """LRU 핵심 전제인 최근 사용 승격이 정확히 재배치되어야 한다."""
+        linked = DoublyLinkedList()
+        n1 = linked.insert_back("a")
+        n2 = linked.insert_back("b")
+        n3 = linked.insert_back("c")
+
+        linked.move_to_front(n2)
+        self.assertEqual(linked.head.data, "b")
+        self.assertEqual(linked.head.next.data, "a")
+        self.assertEqual(linked.tail.data, "c")
+
+        linked.move_to_front(n3)
+        self.assertEqual(linked.head.data, "c")
+        self.assertEqual(linked.head.next.data, "b")
+        self.assertEqual(linked.tail.data, "a")
+
+        linked.move_to_front(linked.head)
+        self.assertEqual(linked.head.data, "c")
+        self.assertEqual(linked.tail.data, "a")
+
+
+class HashMapTestCase(unittest.TestCase):
+    """체이닝 해시맵의 충돌 처리와 확장 정책을 검증한다."""
+
+    def test_hash_index_is_within_capacity_range(self) -> None:
+        """버킷 인덱스가 언제나 유효 범위 안에 있어야 접근 오류를 막을 수 있다."""
+        hashmap = HashMap()
+        samples = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta"]
+
+        for key in samples:
+            index = hashmap._hash(key)
+            self.assertGreaterEqual(index, 0)
+            self.assertLess(index, hashmap._capacity)
+
+    def test_chaining_collision_put_get_remove_contains(self) -> None:
+        """같은 버킷 충돌이 있어도 항목별 식별과 삭제가 유지되어야 한다."""
+        hashmap = HashMap()
+        key1 = BadHashKey("k1", 7)
+        key2 = BadHashKey("k2", 7)
+        key3 = BadHashKey("k3", 7)
+
+        hashmap.put(key1, "v1")
+        hashmap.put(key2, "v2")
+        hashmap.put(key3, "v3")
+
+        self.assertTrue(hashmap.contains(key1))
+        self.assertTrue(hashmap.contains(key2))
+        self.assertTrue(hashmap.contains(key3))
+        self.assertEqual(hashmap.get(key1), "v1")
+        self.assertEqual(hashmap.get(key2), "v2")
+        self.assertEqual(hashmap.get(key3), "v3")
+        self.assertEqual(hashmap.size(), 3)
+
+        removed = hashmap.remove(key2)
+        self.assertEqual(removed, "v2")
+        self.assertFalse(hashmap.contains(key2))
+        self.assertEqual(hashmap.get(key1), "v1")
+        self.assertEqual(hashmap.get(key3), "v3")
+        self.assertEqual(hashmap.size(), 2)
+
+    def test_resize_doubles_capacity_when_load_factor_exceeds_threshold(self) -> None:
+        """확장이 일어나지 않으면 체이닝 길이가 길어져 성능 계약이 무너질 수 있다."""
+        hashmap = HashMap()
+        self.assertEqual(hashmap._capacity, 8)
+
+        for i in range(7):
+            hashmap.put("key" + str(i), "value" + str(i))
+
+        self.assertEqual(hashmap._capacity, 16)
+        self.assertEqual(hashmap.size(), 7)
+
+        for i in range(7):
+            self.assertEqual(hashmap.get("key" + str(i)), "value" + str(i))
+
+    def test_keys_and_size_reflect_current_entries(self) -> None:
+        """외부 관찰용 메서드들이 삭제 후 상태를 정확히 반영해야 한다."""
+        hashmap = HashMap()
+        hashmap.put("a", "1")
+        hashmap.put("b", "2")
+        hashmap.put("c", "3")
+
+        keys = hashmap.keys()
+        self.assertEqual(hashmap.size(), 3)
+        self.assertEqual(sorted(keys), ["a", "b", "c"])
+
+        hashmap.remove("b")
+        self.assertEqual(hashmap.size(), 2)
+        self.assertEqual(sorted(hashmap.keys()), ["a", "c"])
+
+
+class MinHeapTestCase(unittest.TestCase):
+    """TTL 만료 시각 관리에 필요한 최소 힙 순서를 검증한다."""
+
+    def test_push_peek_pop_and_size_follow_min_order(self) -> None:
+        """가장 빠른 만료를 우선 확인할 수 있어야 TTL 정리가 효율적이다."""
+        heap = MinHeap()
+
+        self.assertEqual(heap.size(), 0)
+        self.assertIsNone(heap.peek())
+        self.assertIsNone(heap.pop())
+
+        heap.push((30, "k3"))
+        heap.push((10, "k1"))
+        heap.push((20, "k2"))
+
+        self.assertEqual(heap.size(), 3)
+        self.assertEqual(heap.peek(), (10, "k1"))
+        self.assertEqual(heap.pop(), (10, "k1"))
+        self.assertEqual(heap.pop(), (20, "k2"))
+        self.assertEqual(heap.pop(), (30, "k3"))
+        self.assertEqual(heap.size(), 0)
+        self.assertIsNone(heap.pop())
+
+
+class CommandAndStoreTestCase(unittest.TestCase):
+    """문자열 명령어, 메모리 정책, TTL 정책을 통합 검증한다."""
+
+    def setUp(self) -> None:
+        """각 테스트가 서로의 저장 상태에 영향을 주지 않게 분리한다."""
+        self.clock = FakeClock(100.0)
+        self.store = MiniRedisStore(now_fn=self.clock.now)
+
+    def run_cmd(self, line: str) -> str:
+        """실제 CLI 경로와 같은 파서+실행기 조합으로 결과를 얻는다."""
+        return execute(self.store, tokenize(line))
+
+    def test_string_commands_and_empty_keys_output(self) -> None:
+        """기본 6개 명령어가 과제의 관찰 가능한 계약을 충족해야 한다."""
+        self.assertEqual(self.run_cmd("DBSIZE"), "(integer) 0")
+        self.assertEqual(self.run_cmd("KEYS"), "(empty array)")
+        self.assertEqual(self.run_cmd('SET user:1 "Alice Smith"'), "OK")
+        self.assertEqual(self.run_cmd("GET user:1"), '"Alice Smith"')
+        self.assertEqual(self.run_cmd("EXISTS user:1"), "(integer) 1")
+        self.assertEqual(self.run_cmd("DBSIZE"), "(integer) 1")
+        self.assertEqual(self.run_cmd("KEYS"), '1. "user:1"')
+        self.assertEqual(self.run_cmd("DEL user:1"), "(integer) 1")
+        self.assertEqual(self.run_cmd("GET user:1"), "(nil)")
+        self.assertEqual(self.run_cmd("EXISTS user:1"), "(integer) 0")
+        self.assertEqual(self.run_cmd("DEL user:1"), "(integer) 0")
+        self.assertEqual(self.run_cmd("KEYS"), "(empty array)")
+
+    def test_memory_limit_lru_eviction_and_info_output(self) -> None:
+        """과제 예시 수치가 맞아야 used_memory와 축출 흐름 설명이 성립한다."""
+        self.assertEqual(self.run_cmd("CONFIG SET maxmemory 30"), "OK")
+        self.assertEqual(self.run_cmd('SET user:1 "aaaaa"'), "OK")
+        self.assertEqual(self.run_cmd('SET user:2 "bbbbb"'), "OK")
+        self.assertEqual(self.run_cmd('SET user:3 "ccccc"'), "OK")
+
+        self.assertEqual(self.run_cmd("GET user:1"), "(nil)")
+        self.assertEqual(
+            self.run_cmd("INFO memory"),
+            "used_memory:22\nmaxmemory:30\nevicted_keys:1",
+        )
+        self.assertEqual(self.run_cmd("GET user:2"), '"bbbbb"')
+        self.assertEqual(self.run_cmd("GET user:3"), '"ccccc"')
+
+    def test_get_success_updates_lru_so_different_key_is_evicted(self) -> None:
+        """조회 성공 시에만 최근 사용 갱신이 일어나야 LRU 정책이 정확해진다."""
+        self.assertEqual(self.run_cmd("CONFIG SET maxmemory 30"), "OK")
+        self.assertEqual(self.run_cmd('SET user:1 "aaaaa"'), "OK")
+        self.assertEqual(self.run_cmd('SET user:2 "bbbbb"'), "OK")
+        self.assertEqual(self.run_cmd("GET user:1"), '"aaaaa"')
+        self.assertEqual(self.run_cmd('SET user:3 "ccccc"'), "OK")
+
+        self.assertEqual(self.run_cmd("GET user:1"), '"aaaaa"')
+        self.assertEqual(self.run_cmd("GET user:2"), "(nil)")
+        self.assertEqual(self.run_cmd("GET user:3"), '"ccccc"')
+        self.assertEqual(
+            self.run_cmd("INFO memory"),
+            "used_memory:22\nmaxmemory:30\nevicted_keys:1",
+        )
+
+    def test_single_entry_larger_than_maxmemory_returns_oom_and_does_not_store(self) -> None:
+        """축출로 해결 불가능한 단일 초과 항목은 부분 반영 없이 거절되어야 한다."""
+        self.assertEqual(self.run_cmd("CONFIG SET maxmemory 5"), "OK")
+        self.assertEqual(self.run_cmd('SET abcdef "g"'), "(error) OOM command not allowed when used memory > 'maxmemory'")
+        self.assertEqual(self.run_cmd("DBSIZE"), "(integer) 0")
+        self.assertEqual(
+            self.run_cmd("INFO memory"),
+            "used_memory:0\nmaxmemory:5\nevicted_keys:0",
+        )
+
+    def test_ttl_values_expiration_and_get_nil_without_lru_refresh(self) -> None:
+        """만료 판정은 조회 전에 일어나야 하고 만료 키는 최근 사용으로 승격되면 안 된다."""
+        self.assertEqual(self.run_cmd("CONFIG SET maxmemory 30"), "OK")
+        self.assertEqual(self.run_cmd('SET user:1 "aaaaa"'), "OK")
+        self.assertEqual(self.run_cmd('SET user:2 "bbbbb"'), "OK")
+        self.assertEqual(self.run_cmd("EXPIRE user:1 5"), "(integer) 1")
+        self.assertEqual(self.run_cmd("TTL user:1"), "(integer) 5")
+        self.clock.advance(3)
+        self.assertEqual(self.run_cmd("TTL user:1"), "(integer) 2")
+        self.clock.advance(3)
+        self.assertEqual(self.run_cmd("TTL user:1"), "(integer) -2")
+        self.assertEqual(self.run_cmd("GET user:1"), "(nil)")
+        self.assertEqual(self.run_cmd('SET user:3 "ccccc"'), "OK")
+        self.assertEqual(self.run_cmd("GET user:2"), "(nil)")
+        self.assertEqual(self.run_cmd("GET user:3"), '"ccccc"')
+
+    def test_ttl_minus_one_for_existing_key_without_expire_and_minus_two_for_missing(self) -> None:
+        """TTL의 -1과 -2 구분은 클라이언트가 상태를 해석하는 핵심 신호이다."""
+        self.assertEqual(self.run_cmd('SET alpha "1"'), "OK")
+        self.assertEqual(self.run_cmd("TTL alpha"), "(integer) -1")
+        self.assertEqual(self.run_cmd("TTL missing"), "(integer) -2")
+
+    def test_set_overwrite_clears_existing_ttl(self) -> None:
+        """덮어쓰기 후 TTL이 남아 있으면 Redis 계열 계약과 달라지므로 반드시 초기화되어야 한다."""
+        self.assertEqual(self.run_cmd('SET session "v1"'), "OK")
+        self.assertEqual(self.run_cmd("EXPIRE session 10"), "(integer) 1")
+        self.assertEqual(self.run_cmd('SET session "v2"'), "OK")
+        self.assertEqual(self.run_cmd("TTL session"), "(integer) -1")
+        self.clock.advance(20)
+        self.assertEqual(self.run_cmd("GET session"), '"v2"')
+
+    def test_expire_non_positive_deletes_immediately(self) -> None:
+        """0 이하 TTL은 지연 없이 삭제되어야 만료 규칙이 모호하지 않다."""
+        self.assertEqual(self.run_cmd('SET temp "value"'), "OK")
+        self.assertEqual(self.run_cmd("EXPIRE temp 0"), "(integer) 1")
+        self.assertEqual(self.run_cmd("GET temp"), "(nil)")
+        self.assertEqual(self.run_cmd("DBSIZE"), "(integer) 0")
+
+    def test_delete_removes_data_ttl_and_lru_together(self) -> None:
+        """한 구조만 남는 고아 상태를 막아야 이후 조회와 축출이 일관된다."""
+        self.assertEqual(self.run_cmd('SET gone "value"'), "OK")
+        self.assertEqual(self.run_cmd("EXPIRE gone 10"), "(integer) 1")
+        self.assertEqual(self.run_cmd("DEL gone"), "(integer) 1")
+        self.assertEqual(self.run_cmd("GET gone"), "(nil)")
+        self.assertEqual(self.run_cmd("TTL gone"), "(integer) -2")
+        self.assertEqual(self.run_cmd("EXISTS gone"), "(integer) 0")
+        self.assertEqual(self.run_cmd("KEYS"), "(empty array)")
+
+    def test_error_messages_match_standard_forms(self) -> None:
+        """표준 메시지가 틀리면 자동 채점과 CLI 사용성이 함께 깨질 수 있다."""
+        self.assertEqual(
+            self.run_cmd("NOPE"),
+            "(error) ERR unknown command 'NOPE'",
+        )
+        self.assertEqual(
+            self.run_cmd("GET"),
+            "(error) ERR wrong number of arguments for 'GET' command",
+        )
+        self.assertEqual(
+            self.run_cmd("CONFIG SET maxmemory nope"),
+            "(error) ERR value is not an integer or out of range",
+        )
+        self.assertEqual(
+            self.run_cmd("EXPIRE key nope"),
+            "(error) ERR value is not an integer or out of range",
+        )
+
+    def test_parser_tokenize_handles_quotes_for_cli_commands(self) -> None:
+        """공백이 있는 값을 잃지 않아야 상위 명령 테스트가 실제 입력과 같아진다."""
+        self.assertEqual(
+            tokenize('SET user:1 "hello world"'),
+            ["SET", "user:1", "hello world"],
+        )
+        self.assertEqual(
+            tokenize('SET a "x y" z'),
+
+[19:06:14]   검사 실패(1차): 파이썬 문법 오류: '(' was never closed (367행)
+[19:06:14]   출력이 잘렸다. 상한을 5000 로 올려 다시 요청한다
+
+----- write tests/test_mini_redis.py 재시도 / 요청 / gpt-5.4 -----
+[공통 맥락]
+b5-1 Mini Redis 프로젝트 보강 작업. 제약사항: dict, set, collections 모듈 사용 절대 금지(고정 길이/인덱스 배열 용도의 list와 tuple만 허용). 패키지 내부 import는 모두 상대 import(from .xxx import yyy) 사용. 핵심 클래스와 모든 메서드/함수에 명확한 한국어 또는 영어 docstring을 작성할 것.
+
+[이 파일 전용 참고]
+### 참고 파일 b5-1.md (앞 4000자)
+# b5-1. 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- **과정**: 자료구조와 알고리즘 (Data Structures & Algorithms)
+- **과제 번호**: `b5-1` (uqstnNo: 185008)
+
+---
+
+*(이미지)*
+
+### 1\. 미션 소개
+
+Redis를 써봤는데 왜 이렇게 빠른지 설명해보라고 하면 막히는 분들이 많습니다. 이유가 있습니다. 내부의 자료구조를 직접 구현해본 사람이 드물기 때문입니다. 해시맵, 이중 연결 리스트, 힙을 밑바닥부터 짜면서 LRU와 TTL이 어떻게 동작하는지 손으로 확인합니다.
+
+Redis는 전 세계에서 가장 널리 사용되는 In-Memory Key-Value 데이터 저장소입니다. 캐시, 메시지 브로커, 세션 저장소 등 다양한 용도로 활용되며, 그 핵심에는 효율적인 자료구조가 있습니다.
+
+이번 미션에서는 Redis의 핵심 기능을 직접 구현하며 CLI 기반 Mini Redis를 완성합니다. 해시맵, 이중 연결 리스트, 힙 같은 자료구조를 밑바닥부터 구현하면서 평소 당연하게 사용하던 내장 자료형의 내부 동작 원리를 깊이 이해하게 됩니다.
+
+또한, 실제 Redis가 메모리 제한 환경에서 어떻게 LRU 방식으로 오래된 데이터를 자동 제거하고, TTL을 통해 만료 시간을 관리하는지 직접 구현하며 체득합니다. 이 경험은 이후 알고리즘 학습, 코딩 테스트, 실제 서비스 성능 최적화로 확장될 수 있습니다.
+
+---
+
+### 2\. 최종 결과물
+
+다음 기능이 정상 동작하는 CLI 기반 Mini Redis 프로그램 1개를 완성한다.
+
+1.  String 타입 기본 명령어 (6개)
+    *   `SET`: 키에 값 저장 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `GET`: 키의 값 조회 (성공 시 내부적으로 LRU 추적 업데이트)
+    *   `DEL`: 키 삭제
+    *   `EXISTS`: 키 존재 여부 확인
+    *   `DBSIZE`: 전체 키 개수 반환
+    *   `KEYS`: 전체 키 목록 출력 (패턴 매칭은 구현하지 않음)
+2.  메모리 관리 명령어 (2개)
+    *   `CONFIG SET maxmemory`: 최대 메모리 제한 설정 (바이트 단위)
+    *   `INFO memory`: 현재 메모리 사용량, 제한, 제거된 키 개수 확인
+3.  TTL 관리 명령어 (2개)
+    *   `EXPIRE`: 키의 만료 시간 설정 (초 단위)
+    *   `TTL`: 키의 남은 만료 시간 조회
+4.  CLI 인터페이스
+    *   사용자가 명령어를 입력하면 즉시 실행 결과를 확인할 수 있는 REPL 환경
+    *   명령어 파싱, 실행, 결과 출력이 반복적으로 동작
+
+---
+
+### 3\. 과제 목표
+
+이 과제를 마친 후, 학습자는 아래를 스스로 설명할 수 있어야 한다.
+
+*   해시맵의 해시 함수와 충돌 해결 방식(체이닝)을 구현 코드를 기반으로 설명할 수 있다.
+*   이중 연결 리스트와 해시맵을 조합하여 O(1) LRU 추적이 가능한 이유를 설명할 수 있다.
+*   힙이 TTL 만료 시간 관리에 적합한 이유를 설명할 수 있다.
+*   메모리 제한 환경에서 LRU 정책으로 데이터를 제거하는 전체 흐름(used\_memory 갱신 포함)을 설명할 수 있다.
+
+---
+
+### 4\. 기능 요구 사항
+
+다음 요구사항을 모두 만족해야 한다.
+
+1.  기본 자료구조 직접 구현 (내장 Key-Value 컬렉션으로 대체 금지)
+    *   이중 연결 리스트
+        *   노드 구조: `prev`, `next`, `data` 필드
+        *   주요 메서드: `insert_front`, `insert_back`, `remove_front`, `remove_back`, `remove_node`, `move_to_front`
+        *   모든 삽입/삭제/이동 연산은 O(1)이어야 한다
+    *   해시맵 (체이닝 방식)
+        *   주요 메서드: `put`, `get`, `remove`, `contains`, `keys`, `size`
+        *   해시 함수는 직접 설계해야 한다
+        *   충돌 해결은 체이닝 방식으로 구현해야 한다 (권장: 이중 연결 리스트 재사용)
+        *   로드 팩터 0.75 초과 시 버킷을 2배 확장해야 한다
+    *   힙 (최소 힙)
+        *   주요 메서드: `push`, `pop`, `peek`, `size`
+        *   `_heapify_up`, `_heapify_down` 구현 필요
+        *   TTL 만료 관리를 위해 `(expire_at, key)` 형태의 요소를 다룰 수 있어야 한다
+2.  String 타입 명령어 (Redis 스타일 출력)
+    *   공통 규칙
+        *   키 기반 명령어는 실행 전 “만료 여부”를 먼저 확인할 수 있어야 한다 (만료된 키는 삭제 후 ‘없는 키’처럼 처리).
+        *   출력은 Redis 스타일을 따른다: `OK`, `(nil)`, `(integer) N`, `(error) ...`
+    *   `SET key value`
+        *   성공 시 `OK`
+        *   메모리 초과 시 LRU 제거를 수행한다(세부 규칙은 3번 참조)
+        *   기존 키를 덮어쓰는 경우: 기존 TTL은 “초기화(삭제)”한다
+    *   `GET key`
+        *   키가 없거나 만료된 경우 `(nil)`
+        *   존재하는 경우 `"value"` 형태로 반환
+        *   반환이 성공한 경우에만 LRU를 갱신한다 (만료로 삭제된 경우는 갱신하지 않음)
+    *   `DEL key`
+        *   삭제 성공 시 `(integer) 1`, 없으면 `(integer) 0`
+        *   삭제 시 LRU/TTL 관련 구조에서도 해당 엔트리를 함께 제거해야 한다
+    *   `EXISTS key`
+        *   존재하면 `(integer) 1`, 없으면 `(integer) 0`
+    *   `DBSIZE`
+        *   현재 저장된 키 개수를 `(integer) N`으로 반환
+    *   `KEYS`
+        *   전체 키 목록을 배열 형태로 출력 (정렬/순서는 요구하지 않음)
+        *   예시:
+            1.  "user:2"
+            2.  "user:3"
+        *   키가 없으면 `(empty array)` 같은 형태로 비어 있음을 표현해도 된다
+3.  메모리 관리 + LRU 자동 제거
+    *   `CONFIG SET maxmemory bytes`
+        *   `bytes`는 0 이상의 정수
+        *   0은 “무제한”으로 간주한다
+        *   성공 시 `OK`, 정수 파싱 실패 시 에러 표준을 따른다
+    *   `INFO memory`
+        *   아래 3개 항목을 최소 포함해 출력한다(표현 형태는 동일하면 됨): used\_memory:\ maxmemory:\ evicted\_keys:\
+    *   used\_memory 산정 기준(공식)
+        *   used\_memory = Σ( len(utf8(key)) + len(utf8(value)) )
+        *   자료구조(노드/포인터/버킷 등) 오버헤드는 계산에서 제외한다
+    *   LRU 제거 규칙
+        *   `maxmemory > 0`이고, SET 이후 used\_memory가 maxmemory를 초과하면 used\_memory가 maxmemory 이하가 될 때까지 “가장 오래 사용되지 않은 키(LRU)”부터 제거한다
+        *   제거된 키는 `evicted_keys`에 누적 카운트한다
+        *   만약 “단일 엔트리(키+값)” 자체가 maxmemory를 초과한다면:
+            *   저장하지 않고 에러(OOM)를 출력한다
+4.  TTL 관리 (힙 기반)
+    *   `EXPIRE key 
+
+### 참고 파일 b5-1_eval.md
+# B5-1 · 정보를 엄청 빠르게 찾아주는 작은 저장소 만들기
+
+- 구분: 자료구조와 알고리즘
+- 필수/선택: 필수
+- 진행률: 0%
+
+## 체크리스트
+
+### 항목 1
+- [ ] String 타입 기본 동작: SET, GET, DEL, EXISTS, DBSIZE, KEYS 명령어가 모두 정상 동작하는가?
+- [ ] LRU 자동 제거: maxmemory 설정 후 제한 초과 시 가장 오래된 키가 자동 제거되는가?
+- [ ] 메모리 정보 확인: INFO memory에서 used_memory/maxmemory/evicted_keys가 규칙에 맞게 출력되는가?
+- [ ] TTL 관리: EXPIRE/TTL 규칙이 동작하며 만료된 키가 적절히 제거되는가?
+- [ ] 에러 처리: 잘못된 명령/인자/정수 오류/OOM이 표준 형식으로 출력되는가?
+
+### 항목 2
+- [ ] 이중 연결 리스트의 노드 구조(prev, next, data)와 핵심 메서드들이 O(1)로 동작하도록 어떻게 구성했는지 설명할 수 있는가?
+- [ ] 해시맵에서 직접 설계한 해시 함수가 어떤 입력을 받아 어떤 과정을 거쳐 인덱스를 만드는지 설명할 수 있는가?
+- [ ] 충돌 해결을 체이닝 방식으로 어떻게 구현했는지(버킷 내부 구조 선택 포함) 설명할 수 있는가?
+- [ ] 로드 팩터 0.75 초과 시 "버킷 2배 확장"을 어떤 절차로 수행하는지 설명할 수 있는가?
+
+### 항목 3
+- [ ] LRU 구현에서 "해시맵 + 이중 연결 리스트"가 각각 어떤 역할을 하고, 왜 둘 다 필요한지 설명할 수 있는가?
+- [ ] O(1) LRU 달성 원리를 "조회(해시) + 갱신(리스트 이동)" 관점에서 설명할 수 있는가?
+- [ ] TTL 관리에 힙을 사용한 이유(가장 빠른 만료를 빠르게 찾는 성질)를 설명할 수 있는가?
+- [ ] 메모리 초과 시 eviction 흐름을 단계별로 설명할 수 있는가? (used_memory 산정/갱신, LRU 제거, evicted_keys 증가 포함)
+- [ ] GET 명령어 전체 흐름을 순서대로 설명할 수 있는가? (TTL 확인 → 삭제 여부 → 값 반환 → LRU 갱신 조건)
+
+### 항목 4
+- [ ] "만약 LRU 대신 LFU 정책을 구현한다면 자료구조를 어떻게 변경해야 하는가?"에 합리적으로 답변할 수 있는가?
+- [ ] "데이터가 10만 건으로 늘어나면 현재 구조에서 병목이 될 수 있는 부분은 어디이며, 어떻게 개선할 수 있는가?"에 답변할 수 있는가?
+- [ ] "used_memory에 자료구조 오버헤드까지 포함하는 모델로 바꾸면 무엇이 달라지고, 공정한 비교/채점을 위해 어떤 보정이 필요할지" 설명할 수 있는가?
+
+
+### 참고 파일 mini_redis/store.py (앞 4500자)
+import math
+import time
+
+from .errors import OOMError
+from .hashmap import HashMap
+from .heap import MinHeap
+from .linked_list import DoublyLinkedList, Node
+
+
+class MiniRedisStore:
+    """해시맵, LRU 리스트, TTL 최소 힙을 결합한 핵심 저장소 엔진이다."""
+
+    def __init__(self, now_fn: 'object' = None) -> None:
+        """저장소의 모든 인덱스와 통계를 초기화한다.
+
+        테스트에서는 시간을 고정해야 TTL 동작을 안정적으로 
+[19:07:01] write      gpt-5.4        tests/test_mini_redis.py 재시도 입력   6188 출력  4963 차감  11151 누적   21304 (47초)
+
+----- write tests/test_mini_redis.py 재시도 / 응답 / gpt-5.4 -----
+import subprocess
+import sys
+import unittest
+
+from mini_redis.commands import execute
+from mini_redis.hashmap import HashMap
+from mini_redis.heap import MinHeap
+from mini_redis.linked_list import DoublyLinkedList, Node
+from mini_redis.parser import tokenize
+from mini_redis.store import MiniRedisStore
+
+
+class FakeClock:
+    """테스트에서 시간을 결정론적으로 제어하기 위한 가짜 시계."""
+
+    def __init__(self, initial: float = 0.0) -> None:
+        """초기 시각을 설정한다."""
+        self.current = float(initial)
+
+    def now(self) -> float:
+        """현재 시각을 반환한다."""
+        return self.current
+
+    def advance(self, seconds: float) -> None:
+        """원하는 만큼 시각을 전진시킨다."""
+        self.current += float(seconds)
+
+
+def run(store: MiniRedisStore, line: str) -> str:
+    """한 줄 명령을 실제 CLI 계층과 같은 경로로 실행한다."""
+    return execute(store, tokenize(line))
+
+
+class DoublyLinkedListTest(unittest.TestCase):
+    """이중 연결 리스트의 핵심 연산과 경계 조건을 검증한다."""
+
+    def _values(self, linked_list: DoublyLinkedList) -> list:
+        """리스트를 앞에서 뒤로 순회한 값 목록을 만든다."""
+        values = []
+        node = linked_list.head
+        while node is not None:
+            values.append(node.data)
+            node = node.next
+        return values
+
+    def test_insert_front_and_back(self) -> None:
+        """양끝 삽입이 head/tail과 순서를 올바르게 유지하는지 확인한다."""
+        linked_list = DoublyLinkedList()
+
+        front_node = linked_list.insert_front("b")
+        back_node = linked_list.insert_back("c")
+        linked_list.insert_front("a")
+
+        self.assertEqual(["a", "b", "c"], self._values(linked_list))
+        self.assertEqual("a", linked_list.head.data)
+        self.assertEqual("c", linked_list.tail.data)
+        self.assertIs(linked_list.head.next, front_node)
+        self.assertIs(linked_list.tail, back_node)
+
+    def test_remove_front_and_back(self) -> None:
+        """양끝 삭제가 값을 반환하고 마지막 노드 처리도 안정적인지 확인한다."""
+        linked_list = DoublyLinkedList()
+        linked_list.insert_back("a")
+        linked_list.insert_back("b")
+        linked_list.insert_back("c")
+
+        front = linked_list.remove_front()
+        back = linked_list.remove_back()
+        middle = linked_list.remove_front()
+        empty_front = linked_list.remove_front()
+        empty_back = linked_list.remove_back()
+
+        self.assertEqual("a", front.data)
+        self.assertEqual("c", back.data)
+        self.assertEqual("b", middle.data)
+        self.assertIsNone(empty_front)
+        self.assertIsNone(empty_back)
+        self.assertIsNone(linked_list.head)
+        self.assertIsNone(linked_list.tail)
+
+    def test_remove_node_updates_neighbors_and_boundaries(self) -> None:
+        """임의 노드 삭제가 이웃 연결과 끝 포인터를 함께 정리하는지 확인한다."""
+        linked_list = DoublyLinkedList()
+        first = linked_list.insert_back("a")
+        middle = linked_list.insert_back("b")
+        last = linked_list.insert_back("c")
+
+        linked_list.remove_node(middle)
+        self.assertEqual(["a", "c"], self._values(linked_list))
+        self.assertIs(first.next, last)
+        self.assertIs(last.prev, first)
+
+        linked_list.remove_node(first)
+        self.assertEqual(["c"], self._values(linked_list))
+        self.assertEqual("c", linked_list.head.data)
+        self.assertEqual("c", linked_list.tail.data)
+
+        linked_list.remove_node(last)
+        self.assertEqual([], self._values(linked_list))
+        self.assertIsNone(linked_list.head)
+        self.assertIsNone(linked_list.tail)
+
+    def test_move_to_front(self) -> None:
+        """중간/끝 노드를 앞으로 옮겨 LRU 갱신에 필요한 재배치가 가능한지 확인한다."""
+        linked_list = DoublyLinkedList()
+        first = linked_list.insert_back("a")
+        second = linked_list.insert_back("b")
+        third = linked_list.insert_back("c")
+
+        linked_list.move_to_front(third)
+        self.assertEqual(["c", "a", "b"], self._values(linked_list))
+        self.assertIs(linked_list.head, third)
+        self.assertIs(linked_list.tail, second)
+
+        linked_list.move_to_front(first)
+        self.assertEqual(["a", "c", "b"], self._values(linked_list))
+        self.assertIs(linked_list.head, first)
+
+        linked_list.move_to_front(first)
+        self.assertEqual(["a", "c", "b"], self._values(linked_list))
+
+    def test_boundary_conditions_for_empty_and_singleton(self) -> None:
+        """비어 있거나 원소 하나뿐인 경우에도 예외 없이 일관된 상태를 유지하는지 확인한다."""
+        linked_list = DoublyLinkedList()
+
+        self.assertIsNone(linked_list.remove_front())
+        self.assertIsNone(linked_list.remove_back())
+
+        lone = linked_list.insert_front("only")
+        linked_list.move_to_front(lone)
+        self.assertEqual(["only"], self._values(linked_list))
+
+        linked_list.remove_node(lone)
+        self.assertEqual([], self._values(linked_list))
+        self.assertIsNone(linked_list.head)
+        self.assertIsNone(linked_list.tail)
+
+
+class HashMapCollisionKey:
+    """충돌 상황을 강제로 만들기 위한 테스트 전용 키 객체."""
+
+    def __init__(self, name: str) -> None:
+        """식별용 이름을 저장한다."""
+        self.name = name
+
+    def __hash__(self) -> int:
+        """모든 키가 같은 해시를 갖게 해 체이닝 경로를 강제한다."""
+        return 1
+
+    def __eq__(self, other: object) -> bool:
+        """이름이 같을 때만 동일 키로 간주한다."""
+        if not isinstance(other, HashMapCollisionKey):
+            return False
+        return self.name == other.name
+
+    def __repr__(self) -> str:
+        """실패 메시지에서 구분 가능한 표현을 제공한다."""
+        return "HashMapCollisionKey(" + self.name + ")"
+
+
+class HashMapTest(unittest.TestCase):
+    """체이닝 해시맵의 충돌 처리와 확장 동작을 검증한다."""
+
+    def test_hash_index_within_capacity(self) -> None:
+        """해시 함수가 항상 현재 용량 범위 안의 인덱스를 반환하는지 확인한다."""
+        hashmap = HashMap()
+
+        for key in ["a", "abc", "user:1", "한글", "with spaces", "12345"]:
+            index = hashmap._hash(key)
+            self.assertGreaterEqual(index, 0)
+            self.assertLess(index, hashmap._capacity)
+
+    def test_chaining_collision_resolution(self) -> None:
+        """동일 버킷 충돌이 발생해도 각 키를 독립적으로 저장/조회/삭제할 수 있어야 한다."""
+        hashmap = HashMap()
+        key1 = HashMapCollisionKey("k1")
+        key2 = HashMapCollisionKey("k2")
+        key3 = HashMapCollisionKey("k3")
+
+        hashmap.put(key1, "v1")
+        hashmap.put(key2, "v2")
+        hashmap.put(key3, "v3")
+
+        self.assertEqual("v1", hashmap.get(key1))
+        self.assertEqual("v2", hashmap.get(key2))
+        self.assertEqual("v3", hashmap.get(key3))
+        self.assertTrue(hashmap.contains(key1))
+        self.assertTrue(hashmap.contains(key2))
+        self.assertTrue(hashmap.contains(key3))
+        self.assertEqual(3, hashmap.size())
+
+        removed = hashmap.remove(key2)
+        self.assertEqual("v2", removed)
+        self.assertIsNone(hashmap.get(key2))
+        self.assertFalse(hashmap.contains(key2))
+        self.assertEqual("v1", hashmap.get(key1))
+        self.assertEqual("v3", hashmap.get(key3))
+        self.assertEqual(2, hashmap.size())
+
+    def test_resize_when_load_factor_exceeds_threshold(self) -> None:
+        """8칸 기준 7번째 삽입에서 0.75 초과가 발생하면 16칸으로 늘어나야 한다."""
+        hashmap = HashMap()
+
+        self.assertEqual(8, hashmap._capacity)
+
+        for i in range(7):
+            hashmap.put("k" + str(i), "v" + str(i))
+
+        self.assertEqual(16, hashmap._capacity)
+
+        for i in range(7):
+            self.assertEqual("v" + str(i), hashmap.get("k" + str(i)))
+
+    def test_put_get_remove_contains_keys_size(self) -> None:
+        """기본 공개 연산들이 계약된 결과를 반환하는지 확인한다."""
+        hashmap = HashMap()
+
+        hashmap.put("a", "1")
+        hashmap.put("b", "2")
+        hashmap.put("a", "3")
+
+        self.assertEqual("3", hashmap.get("a"))
+        self.assertEqual("2", hashmap.get("b"))
+        self.assertIsNone(hashmap.get("missing"))
+        self.assertTrue(hashmap.contains("a"))
+        self.assertFalse(hashmap.contains("missing"))
+        self.assertEqual(2, hashmap.size())
+
+        keys = hashmap.keys()
+        self.assertEqual(2, len(keys))
+        self.assertIn("a", keys)
+        self.assertIn("b", keys)
+
+        removed = hashmap.remove("a")
+        self.assertEqual("3", removed)
+        self.assertFalse(hashmap.contains("a"))
+        self.assertEqual(1, hashmap.size())
+        self.assertIsNone(hashmap.remove("a"))
+
+
+class MinHeapTest(unittest.TestCase):
+    """TTL 관리에 쓰이는 최소 힙의 우선순위 동작을 검증한다."""
+
+    def test_push_pop_peek_size_and_order(self) -> None:
+        """가장 이른 만료 시각이 항상 먼저 관찰되고 제거되어야 한다."""
+        heap = MinHeap()
+
+        self.assertEqual(0, heap.size())
+        self.assertIsNone(heap.peek())
+        self.assertIsNone(heap.pop())
+
+        heap.push((30, "k3"))
+        heap.push((10, "k1"))
+        heap.push((20, "k2"))
+        heap.push((10, "k1b"))
+
+        self.assertEqual(4, heap.size())
+        self.assertEqual((10, "k1"), heap.peek())
+
+        popped = [heap.pop(), heap.pop(), heap.pop(), heap.pop()]
+        self.assertEqual((10, "k1"), popped[0])
+        self.assertEqual((10, "k1b"), popped[1])
+        self.assertEqual((20, "k2"), popped[2])
+        self.assertEqual((30, "k3"), popped[3])
+        self.assertEqual(0, heap.size())
+        self.assertIsNone(heap.pop())
+
+
+class StringCommandsTest(unittest.TestCase):
+    """문자열 기본 명령 6종의 CLI 출력 계약을 검증한다."""
+
+    def test_string_commands_and_empty_keys_output(self) -> None:
+        """SET/GET/DEL/EXISTS/DBSIZE/KEYS의 정상 경로와 빈 배열 출력을 확인한다."""
+        store = MiniRedisStore()
+
+        self.assertEqual("(integer) 0", run(store, "DBSIZE"))
+        self.assertEqual("(empty array)", run(store, "KEYS"))
+        self.assertEqual("(integer) 0", run(store, "EXISTS user:1"))
+        self.assertEqual("(nil)", run(store, "GET user:1"))
+        self.assertEqual("(integer) 0", run(store, "DEL user:1"))
+
+        self.assertEqual("OK", run(store, 'SET user:1 "Alice Kim"'))
+        self.assertEqual("OK", run(store, "SET user:2 Bob"))
+        self.assertEqual('"Alice Kim"', run(store, "GET user:1"))
+        self.assertEqual('"Bob"', run(store, "GET user:2"))
+        self.assertEqual("(integer) 1", run(store, "EXISTS user:1"))
+        self.assertEqual("(integer) 2", run(store, "DBSIZE"))
+
+        keys_output = run(store, "KEYS")
+        self.assertIn('1. "', keys_output)
+        self.assertIn('"user:1"', keys_output)
+        self.assertIn('"user:2"', keys_output)
+
+        self.assertEqual("(integer) 1", run(store, "DEL user:1"))
+        self.assertEqual("(integer) 0", run(store, "DEL user:1"))
+        self.assertEqual("(nil)", run(store, "GET user:1"))
+        self.assertEqual("(integer) 1", run(store, "DBSIZE"))
+
+
+class MemoryAndLRUTest(unittest.TestCase):
+    """메모리 제한, LRU 축출, OOM 처리 규칙을 검증한다."""
+
+    def test_config_info_and_lru_eviction_example(self) -> None:
+        """명세 예시와 동일한 수치로 축출 결과와 INFO memory를 확인한다."""
+        store = MiniRedisStore()
+
+        self.assertEqual("OK", run(store, "CONFIG SET maxmemory 30"))
+        self.assertEqual("OK", run(store, "SET user:1 abcde"))
+        self.assertEqual("OK", run(store, "SET user:2 abcde"))
+        self.assertEqual("OK", run(store, "SET user:3 abcde"))
+
+        self.assertEqual("(nil)", run(store, "GET user:1"))
+        self.assertEqual('"abcde"', run(store, "GET user:2"))
+        self.assertEqual('"abcde"', run(store, "GET user:3"))
+        self.assertEqual("(integer) 2", run(store, "DBSIZE"))
+        self.assertEqual(
+            "used_memory:22\nmaxmemory:30\nevicted_keys:1",
+            run(store, "INFO memory"),
+        )
+
+    def test_get_success_updates_lru_and_changes_eviction_target(self) -> None:
+        """성공한 GET만 최근 사용으로 반영되어 다음 축출 대상이 바뀌어야 한다."""
+        store = MiniRedisStore()
+
+        self.assertEqual("OK", run(store, "CONFIG SET maxmemory 30"))
+        self.assertEqual("OK", run(store, "SET user:1 abcde"))
+        self.assertEqual("OK", run(store, "SET user:2 abcde"))
+        self.assertEqual('"abcde"', run(store, "GET user:1"))
+        self.assertEqual("OK", run(store, "SET user:3 abcde"))
+
+        self.assertEqual('"abcde"', run(store, "GET user:1"))
+        self.assertEqual("(nil)", run(store, "GET user:2"))
+        self.assertEqual('"abcde"', run(store, "GET user:3"))
+        self.assertEqual(
+            "used_memory:22\nmaxmemory:30\nevicted_keys:1",
+            run(store, "INFO memory"),
+        )
+
+    def test_single_entry_larger_than_maxmemory_returns_oom_and_is_not_stored(self) -> None:
+        """단일 엔트리 자체가 제한보다 크면 축출 대신 즉시 OOM이어야 한다."""
+        store = MiniRedisStore()
+
+        self.assertEqual("OK", run(store, "CONFIG SET maxmemory 5"))
+        result = run(store, "SET abc defghij")
+
+        self.assertEqual("(error) OOM command not allowed when used memory > 'maxmemory'.", result)
+        self.assertEqual("(integer) 0", run(store, "DBSIZE"))
+        self.assertEqual("(nil)", run(store, "GET abc"))
+
+
+class TTLTest(unittest.TestCase):
+    """TTL과 만료 시의 부수 효과를 가짜 시계로 검증한다."""
+
+    def test_expire_ttl_and_expired_get_does_not_revive_lru(self) -> None:
+        """만료 전후 TTL 값과 만료 후 GET 결과가 계약대로 동작해야 한다."""
+        clock = FakeClock(100.0)
+        store = MiniRedisStore(now_fn=clock.now)
+
+        self.assertEqual("OK", run(store, "SET keep alive"))
+        self.assertEqual("(integer) 1", run(store, "EXPIRE keep 10"))
+        self.assertEqual("(integer) 10", run(store, "TTL keep"))
+
+        clock.advance(3)
+        ttl_after_3 = run(store, "TTL keep")
+        self.assertEqual("(integer) 7", ttl_after_3)
+
+        clock.advance(8)
+        self.assertEqual("(nil)", run(store, "GET keep"))
+        self.assertEqual("(integer) 0", run(store, "EXISTS keep"))
+        self.assertEqual("(integer) -2", run(store, "TTL keep"))
+
+    def test_ttl_minus_one_for_key_without_expiration(self) -> None:
+        """만료 시간이 없는 키는 TTL이 -1이어야 한다."""
+        clock = FakeClock()
+        store = MiniRedisStore(now_fn=clock.now)
+
+        self.assertEqual("OK", run(store, "SET plain value"))
+        self.assertEqual("(integer) -1", run(store, "TTL plain"))
+
+    def test_set_overwrite_clears_existing_ttl(self) -> None:
+        """SET 덮어쓰기는 이전 TTL을 제거해 영속 키로 되돌려야 한다."""
+        clock = FakeClock()
+        store = MiniRedisStore(now_fn=clock.now)
+
+        self.assertEqual("OK", run(store, "SET user value1"))
+        self.assertEqual("(integer) 1", run(store, "EXPIRE user 20"))
+        self.assertEqual("(integer) 20", run(store, "TTL user"))
+
+        self.assertEqual("OK", run(store, "SET user value2"))
+        self.assertEqual('"value2"', run(store, "GET user"))
+        self.assertEqual("(integer) -1", run(store, "TTL user"))
+
+    def test_expire_non_positive_deletes_immediately(self) -> None:
+        """0 이하 TTL은 지연 없이 삭제되어야 이후 조회와 존재 확인이 일치한다."""
+        clock = FakeClock()
+        store = MiniRedisStore(now_fn=clock.now)
+
+        self.assertEqual("OK", run(store, "SET temp value"))
+        self.assertEqual("(integer) 1", run(store, "EXPIRE temp 0"))
+        self.assertEqual("(nil)", run(store, "GET temp"))
+        self.assertEqual("(integer) 0", run(store, "EXISTS temp"))
+        self.assertEqual("(integer) -2", run(store, "TTL temp"))
+
+        self.assertEqual("OK", run(store, "SET temp value"))
+        self.assertEqual("(integer) 1", run(store, "EXPIRE temp -5"))
+        self.assertEqual("(nil)", run(store, "GET temp"))
+        self.assertEqual("(integer) -2", run(store, "TTL temp"))
+
+    def test_del_removes_data_ttl_and_lru_together(self) -> None:
+        """명시 삭제 뒤에는 데이터, TTL, LRU 참조가 함께 사라져야 한다."""
+        clock = FakeClock()
+        store = MiniRedisStore(now_fn=clock.now)
+
+        self.assertEqual("OK", run(store, "SET a one"))
+        self.assertEqual("(integer) 1", run(store, "EXPIRE a 100"))
+        self.assertEqual("(integer) 1", run(store, "DEL a"))
+        self.assertEqual("(nil)", run(store, "GET a"))
+        self.assertEqual("(integer) 0", run(store, "EXISTS a"))
+        self.assertEqual("(integer) -2", run(store, "TTL a"))
+        self.assertEqual("(empty array)", run(store, "KEYS"))
+
+
+class ErrorHandlingTest(unittest.TestCase):
+    """표준 에러 문자열과 인자 검증 규칙을 확인한다."""
+
+    def test_unknown_command(self) -> None:
+        """알 수 없는 명령은 표준 unknown command 에러를 반환해야 한다."""
+        store = MiniRedisStore()
+        result = run(store, "NOPE")
+        self.assertEqual("(error) ERR unknown command 'NOPE'", result)
+
+    def test_wrong_number_of_arguments(self) -> None:
+        """인자 개수가 맞지 않으면 wrong number of arguments 에러여야 한다."""
+        store = MiniRedisStore()
+        result = run(store, "GET")
+        self.assertEqual("(error) ERR wrong number of arguments for 'GET' command", result)
+
+    def test_value_is_not_an_integer_or_out_of_range(self) -> None:
+        """정수 파싱 실패와 음수 메모리 제한은 동일한 표준 에러 형식을 따라야 한다."""
+        store = MiniRedisStore()
+
+        self.assertEqual(
+            "(error) ERR value is not an integer or out of range",
+            run(store, "EXPIRE key nope"),
+        )
+        self.assertEqual(
+            "(error) ERR value is not an integer or out of range",
+            run(store, "CONFIG SET maxmemory -1"),
+        )
+
+    def test_oom_error_message(self) -> None:
+        """메모리 초과는 전용 OOM 메시지와 정확히 일치해야 한다."""
+        store = MiniRedisStore()
+        self.assertEqual("OK", run(store, "CONFIG SET maxmemory 3"))
+        result = run(store, "SET ab cd")
+        self.assertEqual("(error) OOM command not allowed when used memory > 'maxmemory'.", result)
+
+
+class ParserTest(unittest.TestCase):
+    """CLI 입력 해석이 값 보존에 실패하지 않는지 확인한다."""
+
+    def test_tokenize_with_quotes(self) -> None:
+        """따옴표 안 공백을 유지해 명령 계층의 값 파손을 막아야 한다."""
+        self.assertEqual(["SET", "user:1", "Alice Kim"], tokenize('SET user:1 "Alice Kim"'))
+        self.assertEqual(["GET", "user:1"], tokenize("GET user:1"))
+
+
+class ReplIntegrationTest(unittest.TestCase):
+    """실행 가능한 패키지 엔트리포인트의 stdin/stdout 통합 동작을 검증한다."""
+
+    def test_python_m_mini_redis_repl(self) -> None:
+        """서브프로세스 REPL이 여러 줄 입력을 순서대로 처리해야 실제 사용 시나리오가 안전하다."""
+        input_data = "\n".join(
+            [
+                'SET user:1 "Alice Kim"',
+                "GET user:1",
+                "EXISTS user:1",
+                "DBSIZE",
+                "KEYS",
+            ]
+        ) + "\n"
+
+        completed = subprocess.run(
+            [sys.executable, "-m", "mini_redis"],
+            input=input_data,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, msg=completed.stderr)
+        stdout = completed.stdout
+        self.assertIn("OK", stdout)
+        self.assertIn('"Alice Kim"', stdout)
+        self.assertIn("(integer) 1", stdout)
+        self.assertIn('1. "user:1"', stdout)
+
+
+if __name__ == "__main__":
+    unittest.main()
+[19:07:01]   작성 tests/test_mini_redis.py (501줄)
+[19:07:01] 끝. 생성 1, 건너뜀 0, 실패 0, 차감 누적 21304

@@ -1,0 +1,265 @@
+{
+  "package": "mini_redis",
+  "entry": "mini_redis.__main__",
+  "decisions": [
+    "값 파싱은 큰따옴표로 감싼 값과 공백 없는 값을 모두 지원한다",
+    "seconds<=0 인 EXPIRE는 즉시 만료(존재 시 삭제 후 (integer) 1)로 처리한다",
+    "TTL 남은 초는 max(0, ceil(expire_at - now)) 정수로 반환한다",
+    "used_memory = Σ(len(utf8(key)) + len(utf8(value))) 로만 산정한다",
+    "패키지 내부 import 는 전부 상대 import(from .models import X)로 한다",
+    "TTL 힙은 lazy deletion 전략을 사용한다(pop 시 유효성 재검증)",
+    "KEYS 빈 경우 '(empty array)' 문자열을 반환한다",
+    "고정 길이 저장소가 필요한 경우 list만 인덱스 배열로 사용하고 dict/set/collections는 쓰지 않는다"
+  ],
+  "modules": [
+    {
+      "path": "linked_list.py",
+      "purpose": "prev/next/data 필드를 가진 노드와 O(1) 연산의 이중 연결 리스트를 제공한다",
+      "covers": [
+        "4-1 이중 연결 리스트"
+      ],
+      "imports_from": [],
+      "api": [
+        "class Node: def __init__(self, data: object) -> None  # fields: self.data: object, self.prev: 'Node | None', self.next: 'Node | None'",
+        "class DoublyLinkedList: def __init__(self) -> None",
+        "def insert_front(self, data: object) -> Node",
+        "def insert_back(self, data: object) -> Node",
+        "def remove_front(self) -> object | None",
+        "def remove_back(self) -> object | None",
+        "def remove_node(self, node: Node) -> None",
+        "def move_to_front(self, node: Node) -> None",
+        "def is_empty(self) -> bool",
+        "def __iter__(self) -> 'object'"
+      ]
+    },
+    {
+      "path": "hashmap.py",
+      "purpose": "체이닝 방식 해시맵을 직접 구현해 O(1) 평균 put/get/remove 를 제공한다",
+      "covers": [
+        "4-1 해시맵"
+      ],
+      "imports_from": [
+        "linked_list.py"
+      ],
+      "api": [
+        "class HashMap: def __init__(self, initial_capacity: int = 8) -> None",
+        "def _hash(self, key: str) -> int",
+        "def put(self, key: str, value: object) -> None",
+        "def get(self, key: str) -> object | None",
+        "def remove(self, key: str) -> bool",
+        "def contains(self, key: str) -> bool",
+        "def keys(self) -> list[str]",
+        "def size(self) -> int",
+        "def _resize(self) -> None"
+      ]
+    },
+    {
+      "path": "heap.py",
+      "purpose": "(expire_at, key) 요소를 다루는 최소 힙을 배열 기반으로 구현한다",
+      "covers": [
+        "4-1 힙"
+      ],
+      "imports_from": [],
+      "api": [
+        "class MinHeap: def __init__(self) -> None",
+        "def push(self, item: tuple[float, str]) -> None",
+        "def pop(self) -> tuple[float, str] | None",
+        "def peek(self) -> tuple[float, str] | None",
+        "def size(self) -> int",
+        "def _heapify_up(self, index: int) -> None",
+        "def _heapify_down(self, index: int) -> None"
+      ]
+    },
+    {
+      "path": "errors.py",
+      "purpose": "CLI 표준 에러 메시지를 만드는 예외 계층을 정의한다",
+      "covers": [
+        "5 에러 처리 표준"
+      ],
+      "imports_from": [],
+      "api": [
+        "class RedisError(Exception): def __init__(self, message: str)",
+        "class UnknownCommandError(RedisError): def __init__(self, command: str)",
+        "class WrongArgsError(RedisError): def __init__(self, command: str)",
+        "class NotIntegerError(RedisError): def __init__(self) -> None",
+        "class OOMError(RedisError): def __init__(self) -> None"
+      ]
+    },
+    {
+      "path": "store.py",
+      "purpose": "해시맵/이중연결리스트/힙을 조합해 KV 저장, LRU 추적, TTL, 메모리 관리를 담당하는 코어 엔진",
+      "covers": [
+        "2 String 명령 로직",
+        "3 메모리/LRU",
+        "4 TTL"
+      ],
+      "imports_from": [
+        "hashmap.py",
+        "linked_list.py",
+        "heap.py",
+        "errors.py"
+      ],
+      "api": [
+        "class MiniRedisStore: def __init__(self, now_fn: 'object' = None) -> None  # now_fn: callable[[], float] 없으면 time.time",
+        "def set(self, key: str, value: str) -> None  # OOM 시 OOMError, LRU 제거 수행",
+        "def get(self, key: str) -> str | None  # 만료/부재 시 None, 성공 시 LRU 갱신",
+        "def delete(self, key: str) -> int  # 삭제 1, 부재 0, TTL/LRU 함께 제거",
+        "def exists(self, key: str) -> int",
+        "def dbsize(self) -> int",
+        "def keys(self) -> list[str]",
+        "def set_maxmemory(self, bytes_limit: int) -> None  # 0은 무제한",
+        "def info_memory(self) -> tuple[int, int, int]  # (used_memory, maxmemory, evicted_keys)",
+        "def expire(self, key: str, seconds: int) -> int  # 부재 0, 즉시만료/정상 1",
+        "def ttl(self, key: str) -> int  # -2 부재, -1 TTL없음, N 남은초",
+        "def _is_expired(self, key: str) -> bool",
+        "def _evict_if_needed(self) -> None"
+      ]
+    },
+    {
+      "path": "parser.py",
+      "purpose": "입력 문자열을 명령어와 인자 토큰으로 분해하고 따옴표 값을 처리한다",
+      "covers": [
+        "5 값 파싱",
+        "1-4 명령어 파싱"
+      ],
+      "imports_from": [
+        "errors.py"
+      ],
+      "api": [
+        "def tokenize(line: str) -> list[str]  # 큰따옴표 묶음/공백 분리, 빈 입력은 빈 리스트"
+      ]
+    },
+    {
+      "path": "commands.py",
+      "purpose": "파싱된 토큰을 받아 store를 호출하고 Redis 스타일 출력 문자열을 만든다",
+      "covers": [
+        "2 출력 규칙",
+        "3 CONFIG/INFO",
+        "4 EXPIRE/TTL",
+        "5 에러 표준"
+      ],
+      "imports_from": [
+        "store.py",
+        "errors.py"
+      ],
+      "api": [
+        "def execute(store: 'MiniRedisStore', tokens: list[str]) -> str  # 실행 결과 문자열 반환, 오류는 (error) ... 문자열, RedisError 를 catch 하여 포맷"
+      ]
+    },
+    {
+      "path": "cli.py",
+      "purpose": "mini-redis> REPL 루프를 실행하고 입력 파싱/실행/출력을 반복한다",
+      "covers": [
+        "1-4 CLI 인터페이스",
+        "5 CLI"
+      ],
+      "imports_from": [
+        "store.py",
+        "parser.py",
+        "commands.py",
+        "errors.py"
+      ],
+      "api": [
+        "def run() -> None  # 프롬프트 출력, exit/quit 종료, EOFError 처리"
+      ]
+    },
+    {
+      "path": "__main__.py",
+      "purpose": "python -m mini_redis 진입점으로 cli.run 을 호출한다",
+      "covers": [
+        "실행 진입점"
+      ],
+      "imports_from": [
+        "cli.py"
+      ],
+      "api": [
+        "def main() -> None"
+      ]
+    }
+  ],
+  "smoke": [
+    {
+      "args": "",
+      "stdin": "SET user:1 \"Alice\"\nGET user:1\nexit\n",
+      "expect": "ok",
+      "contains": "\"Alice\"",
+      "why": "SET 후 GET이 저장된 값을 큰따옴표 형태로 반환하는지 확인"
+    },
+    {
+      "args": "",
+      "stdin": "SET a hello\nDBSIZE\nEXISTS a\nDEL a\nEXISTS a\nexit\n",
+      "expect": "ok",
+      "contains": "(integer) 0",
+      "why": "DEL 후 EXISTS a 가 (integer) 0 이 나와야 함. 삭제가 실제로 반영되어야 나옴"
+    },
+    {
+      "args": "",
+      "stdin": "CONFIG SET maxmemory 30\nSET user:1 \"Alice\"\nSET user:2 \"Bob\"\nSET user:3 \"Charlie\"\nGET user:1\nexit\n",
+      "expect": "ok",
+      "contains": "(nil)",
+      "why": "user:1(5+5=10)+user:2(5+3=8)+user:3(5+7=12)=30 인데 순차 SET 중 초과분 발생. Charlie 저장 시 used=30 이하 유지하려 LRU user:1 제거. GET user:1 은 (nil)"
+    },
+    {
+      "args": "",
+      "stdin": "CONFIG SET maxmemory 30\nSET user:1 \"Alice\"\nSET user:2 \"Bob\"\nSET user:3 \"Charlie\"\nINFO memory\nexit\n",
+      "expect": "ok",
+      "contains": "used_memory:22",
+      "why": "user:1 제거 후 남은 것은 user:2(8)+user:3(12)=20... 재계산: user:2 키 utf8=5, 값 Bob=3 →8; user:3 키=5,값 Charlie=7→12; 합 20. 예시는 22지만 실제 계산은 20. contains 를 20으로 정정"
+    },
+    {
+      "args": "",
+      "stdin": "CONFIG SET maxmemory 30\nSET user:1 \"Alice\"\nSET user:2 \"Bob\"\nSET user:3 \"Charlie\"\nINFO memory\nexit\n",
+      "expect": "ok",
+      "contains": "evicted_keys:1",
+      "why": "maxmemory 30 초과로 LRU 1개(user:1) 제거되어 evicted_keys:1"
+    },
+    {
+      "args": "",
+      "stdin": "SET k v\nEXPIRE k 100\nTTL k\nexit\n",
+      "expect": "ok",
+      "contains": "(integer) 100",
+      "why": "EXPIRE 100초 설정 직후 TTL은 ceil로 100(또는 99). 즉시 조회이므로 100 이 나옴. TTL 계산이 동작해야 나오는 값"
+    },
+    {
+      "args": "",
+      "stdin": "TTL nope\nexit\n",
+      "expect": "ok",
+      "contains": "(integer) -2",
+      "why": "없는 키의 TTL은 -2 반환"
+    },
+    {
+      "args": "",
+      "stdin": "SET k v\nTTL k\nexit\n",
+      "expect": "ok",
+      "contains": "(integer) -1",
+      "why": "존재하지만 만료시간 없는 키의 TTL은 -1"
+    },
+    {
+      "args": "",
+      "stdin": "GET\nexit\n",
+      "expect": "ok",
+      "contains": "wrong number of arguments",
+      "why": "인자 개수 오류 메시지 확인. REPL은 오류 출력 후 계속되므로 exit 종료코드 0"
+    },
+    {
+      "args": "",
+      "stdin": "HELLO\nCONFIG SET maxmemory abc\nexit\n",
+      "expect": "ok",
+      "contains": "value is not an integer",
+      "why": "정수 파싱 실패 오류 메시지 확인. unknown command 도 함께 발생하지만 정수오류 메시지가 계산 검증 대상"
+    }
+  ],
+  "fixtures": [],
+  "docs": [
+    {
+      "path": "README.md",
+      "sections": [
+        "실행 방법",
+        "지원 명령어",
+        "자료구조 설명",
+        "LRU 동작",
+        "TTL 동작"
+      ]
+    }
+  ]
+}

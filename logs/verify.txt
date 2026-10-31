@@ -1,0 +1,67 @@
+[통과] py_compile
+
+
+[통과] mini_redis.__main__ stdin='SET user:1 "Alice"\nGET user:1\nexit\n'
+mini-redis> OK
+mini-redis> "Alice"
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='SET a hello\nDBSIZE\nEXISTS a\nDEL a\nEXISTS a\nexit\n'
+mini-redis> OK
+mini-redis> (integer) 1
+mini-redis> (integer) 1
+mini-redis> (integer) 1
+mini-redis> (integer) 0
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='CONFIG SET maxmemory 30\nSET user:1 "Alice"\nSET user:2 "Bo
+mini-redis> OK
+mini-redis> OK
+mini-redis> OK
+mini-redis> OK
+mini-redis> (nil)
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='CONFIG SET maxmemory 30\nSET user:1 "Alice"\nSET user:2 "Bo
+mini-redis> OK
+mini-redis> OK
+mini-redis> OK
+mini-redis> OK
+mini-redis> used_memory:22
+maxmemory:30
+evicted_keys:1
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='CONFIG SET maxmemory 30\nSET user:1 "Alice"\nSET user:2 "Bo
+mini-redis> OK
+mini-redis> OK
+mini-redis> OK
+mini-redis> OK
+mini-redis> used_memory:22
+maxmemory:30
+evicted_keys:1
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='SET k v\nEXPIRE k 100\nTTL k\nexit\n'
+mini-redis> OK
+mini-redis> (integer) 1
+mini-redis> (integer) 100
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='TTL nope\nexit\n'
+mini-redis> (integer) -2
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='SET k v\nTTL k\nexit\n'
+mini-redis> OK
+mini-redis> (integer) -1
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='GET\nexit\n'
+mini-redis> (error) ERR wrong number of arguments for 'GET' command
+mini-redis>
+
+[통과] mini_redis.__main__ stdin='HELLO\nCONFIG SET maxmemory abc\nexit\n'
+mini-redis> (error) ERR unknown command 'HELLO'
+mini-redis> (error) ERR value is not an integer or out of range
+mini-redis>
