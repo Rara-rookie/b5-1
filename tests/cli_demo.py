@@ -72,10 +72,10 @@ def main() -> None:
         "3. maxmemory와 LRU 축출",
         [
             "CONFIG SET maxmemory 20",
-            "SET a 123456789",
-            "SET b 123456789",
+            "SET a mynameisA",
+            "SET b mynameisB",
             "GET a",
-            "SET c 123456789",
+            "SET c mynameisC",
             "KEYS",
             "INFO memory",
             "quit",
