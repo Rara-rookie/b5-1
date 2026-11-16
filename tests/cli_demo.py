@@ -1,45 +1,43 @@
-"""실제 CLI 입출력을 보여 주는 Mini Redis 데모 스크립트.
+"""한 줄 입력 뒤 한 줄 결과를 보여 주는 Mini Redis CLI 데모 스크립트.
 
 실행:
     python tests/cli_demo.py
 
-이 파일은 단위 테스트가 아니라 평가 시연용이다. 각 시나리오를 별도의
-`python -m mini_redis` 프로세스로 실행하므로, 앞 시나리오의 메모리 설정과
-저장 데이터가 다음 시나리오에 영향을 주지 않는다.
+이 파일은 단위 테스트가 아니라 평가 시연용이다. 실제 REPL과 같은
+`tokenize → execute → print` 경로를 사용하되, 사람이 읽기 좋게 각 입력 직후
+그 결과를 출력한다. 각 시나리오는 별도 Store를 사용하므로 앞 시나리오의
+메모리 설정과 저장 데이터가 다음 시나리오에 영향을 주지 않는다.
 """
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from collections.abc import Sequence
+from pathlib import Path
+
+# `python tests/cli_demo.py`로 직접 실행하면 Python은 tests 폴더만 모듈 탐색
+# 경로에 넣는다. 부모인 프로젝트 루트를 추가해 mini_redis 패키지를 찾게 한다.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from mini_redis.commands import execute
+from mini_redis.parser import tokenize
+from mini_redis.store import MiniRedisStore
 
 
 def run_scenario(title: str, commands: Sequence[str]) -> None:
-    """명령 묶음을 실제 REPL에 전달하고 입력과 출력을 화면에 표시한다."""
-    input_text = "\n".join(commands) + "\n"
-    completed = subprocess.run(
-        [sys.executable, "-m", "mini_redis"],
-        input=input_text,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        check=False,
-    )
-
+    """각 명령과 그 결과를 실제 CLI처럼 순서대로 출력한다."""
+    store = MiniRedisStore()
     print("\n" + "=" * 72)
     print(title)
-    print("- 입력 명령")
     for command in commands:
-        print("  " + command)
-    print("- 실제 CLI 출력")
-    print(completed.stdout.rstrip())
-
-    if completed.stderr:
-        print("- stderr")
-        print(completed.stderr.rstrip())
-    if completed.returncode != 0:
-        raise SystemExit("CLI 실행 실패: exit code " + str(completed.returncode))
+        print("mini-redis> " + command)
+        if command.lower() == "exit" or command.lower() == "quit":
+            break
+        result = execute(store, tokenize(command))
+        if result:
+            print(result)
 
 
 def main() -> None:
