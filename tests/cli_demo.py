@@ -26,18 +26,36 @@ from mini_redis.parser import tokenize
 from mini_redis.store import MiniRedisStore
 
 
-def run_scenario(title: str, commands: Sequence[str]) -> None:
+def run_scenario(title: str, commands: Sequence[str | tuple[int, str]]) -> None:
     """각 명령과 그 결과를 실제 CLI처럼 순서대로 출력한다."""
-    store = MiniRedisStore()
+    now = 0
+    timed = any(isinstance(step, tuple) for step in commands)
+    store = MiniRedisStore(now_fn=lambda: now) if timed else MiniRedisStore()
     print("\n" + "=" * 72)
     print(title)
-    for command in commands:
+    for step in commands:
+        if isinstance(step, tuple):
+            now, command = step
+            print(f"[시연 시각 {now}초] ", end="")
+        else:
+            command = step
         print("mini-redis> " + command)
         if command.lower() == "exit" or command.lower() == "quit":
             break
         result = execute(store, tokenize(command))
         if result:
             print(result)
+        entries = {key: store._data.get(key) for key in store._data.keys()}
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+        print(GREEN + "해시맵 (키 → 값):", entries)
+        print(GREEN + "LRU 연결 리스트 (최근 → 오래된 순서):", list(store._lru_list))
+        print(GREEN + "TTL 힙 (만료 시각, 키):", store._ttl_heap._data)
+        if timed:
+            deadlines = {key: store._ttl_map.get(key) for key in store._ttl_map.keys()}
+            print("TTL 맵 (키 → 최신 만료 시각):", deadlines)
+            print(f"used_memory: {store._used_memory} bytes")
+        print(RESET)
 
 
 def main() -> None:
@@ -56,14 +74,15 @@ def main() -> None:
     )
 
     run_scenario(
-        "2. TTL 설정과 조회",
+        "2. TTL 연장 후 예전 힙 기록 정리와 실제 키 만료",
         [
-            "SET session:1 abc",
-            "EXPIRE session:1 60",
-            "TTL session:1",
-            "TTL missing:key",
-            "EXPIRE session:1 0",
-            "GET session:1",
+            (100, 'SET user:2 "Bob"'),
+            (100, "EXPIRE user:2 3"),
+            (101, "EXPIRE user:2 10"),
+            (101, "TTL user:2"),
+            (104, "GET user:2"),
+            (112, "GET user:2"),
+            (112, "TTL user:2"),
             "quit",
         ],
     )
@@ -71,13 +90,13 @@ def main() -> None:
     run_scenario(
         "3. maxmemory와 LRU 축출",
         [
-            "CONFIG SET maxmemory 20",
-            "SET a mynameisA",
-            "SET b mynameisB",
-            "GET a",
-            "SET c mynameisC",
-            "KEYS",
+            "CONFIG SET maxmemory 30",
+            'SET user:1 "Alice"',
+            'SET user:2 "Bob"',
+            'SET user:3 "Charlie"',
+            "GET user:1",
             "INFO memory",
+            "KEYS",
             "quit",
         ],
     )
